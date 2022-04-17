@@ -8,12 +8,12 @@ subtitle: ''
 description: ''
 keywords:
 author: Lynn Zhou
-language: ch
+language: en
 timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: http://lzreload.com/en/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -103,5 +103,5 @@ theme: kaze
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
     type: git
-    repo: git@github.com:lz-nsc/lz-nsc.github.io.git
+    repo: git@github.com:lz-nsc/en.git
     branch: master

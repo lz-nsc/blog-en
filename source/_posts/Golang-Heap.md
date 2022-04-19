@@ -5,7 +5,7 @@ tags: Golang
 comments: true
 ---
 ## Interfaces
-Package `heap` defines `Interface` which contains `Interface` of package `sort`, and two method: Push and Pop.
+Package `heap` defines `Interface` which contains `Interface` of package `sort`, and two methods: Push and Pop.
 
 ```go
 // go1.18.1/src/container/heap/heap.go
@@ -40,7 +40,7 @@ type Interface interface {
 }
 ```
 
-It mains that in order to implement `Interface` of package heap, our structure should have 5 method: Len, Less, Swap, Push and Pop.
+It mains that in order to implement `Interface` of package heap, our structure should have 5 methods: Len, Less, Swap, Push and Pop.
 
 For example:
 
@@ -69,11 +69,11 @@ func (m *MinHeap) Pop() any {
 }
 ```
 
-Above is a new structure named MinHeap which implements all the methods of `Interface`in package `heap`.
+Above is a new structure named MinHeap which implements all the methods of `Interface` in package `heap`.
 
-Now that we’ve already defined a structure which has all these 5 methods, how do we use this package and how does this package works?
+Now that we’ve already defined a structure which has all these 5 methods, how do we use this package and how does this package work?
 
-## Funcions
+## Functions
 There are 5 public functions in this package:
 
 ### Init
@@ -82,7 +82,7 @@ There are 5 public functions in this package:
 
 According to the code from this package, `Init` will perform bottom-up construction in order to build the heap from array with O(n) time complexity. 
 
-- It will start at the last non-leaf node and swap it with its smallest child if this subtree does not satisfy the requirement of `Minheap`. Here it will call the `Less` and `Swap` function which we defined for the `MinHeap` previously in order to compare and swap two nodes.
+- It will start from the last non-leaf node and swap it with its smallest child if this subtree does not meet the requirement of `Minheap`(In this example, we defined a minHeap, whose requirement is the parent node must smaller than all its childs). Here it will call the `Less` and `Swap` function which we defined for the `MinHeap` previously in order to compare and swap two nodes.
 - Then it will move to the next non-leaf node and keep swapping until the whole tree become a `MinHeap`
 
 ```go
@@ -134,7 +134,7 @@ The `Init` function will build the heap like this:
 
 The output of previous code will be:
 
-```go
+```bash
 $ go run main.go
 [Heap] Start heap tast, creating original array ...
 [Heap] Original array :[5 3 7 8 2 1]
@@ -181,7 +181,7 @@ The `Pop` function will process the `Minheap` as:
 
 The output of previous code will be:
 
-```go
+```bash
 ...
 [Heap] MinHeap:[1 2 5 8 3 7]
 [Heap] Pop:1 MinHeap:[2 3 5 8 7]
@@ -192,7 +192,7 @@ The output of previous code will be:
 
 `Push` function will first call the `Push` method of the given interface(`MinHeap`) in order to put the new node to the end of the array.
 
-Then it will keep moving this new node up using `MinHeap`'s `Less` and `Swap` method to make sure the new array still satisfy the requirement of `MinHeap`.
+Then it will keep moving this new node up using `MinHeap`'s `Less` and `Swap` methods to make sure that the new array still meets the requirement of `MinHeap`.
 
 ```go
 // Push pushes the element x onto the heap.
@@ -234,7 +234,7 @@ The `Push` function will process like this:
 
 And the output of previous code will be:
 
-```go
+```bash
 ...
 [Heap] MinHeap:[1 2 5 8 3 7]
 [Heap] Pop:1 MinHeap:[2 3 5 8 7]
@@ -244,7 +244,7 @@ And the output of previous code will be:
 
 ### Fix
 
-`Fix` function of package heap can be used when one of the node’s value is changed. In this situation, we don’t need to use Init to rebuild the whole tree, we only need to move this value down/up in order to make the array satisfy the requirement again:
+`Fix` function of package heap can be used when one of the node’s value is changed. In this situation, we don’t need to use Init to rebuild the whole tree, we only need to move this node down/up in order to make the array to meet the requirement again:
 
 ```go
 // Fix re-establishes the heap ordering after the element at index i has changed its value.
@@ -258,7 +258,7 @@ func Fix(h Interface, i int) {
 }
 ```
 
-`down` function will return a boolean value to indicate whether the position of target node has changed in previous process. If not, it means that it might need to move up.
+`down` function will return a boolean value to indicate whether the position of target node has been changed in previous process. If not, it means that it might need to move up.
 
 For example:
 
@@ -285,7 +285,7 @@ The `Fix` function will process like this:
 
 And the output of previous code will be:
 
-```go
+```bash
 [Heap] Changing one node of minHeap [2 3 4 8 7 5]..
 [Heap] MinHeap will be fixed:[2 3 6 8 7 5]
 [Heap] MinHeap after fix:[2 3 5 8 7 6]
@@ -299,7 +299,7 @@ And the output of previous code will be:
 
 - It will shorten the length of the array in order to exclude the last node in the tree (which will be change to the target node in next step)
 - Then it will swap the target node with the last node.
-- Coz the value that the previous position of target node has been changed, this function will act like `Fix` function to make the array satisfy the requirement again.
+- Coz the value the previous position of target node holds has been changed, this function will act like `Fix` function to make the array to meet the requirement again.
 - Finally it will pop out the current last node which is the target node as well.
 
 ```go
@@ -333,5 +333,12 @@ func main(){
 The `Remove` function will process like this:
 
 ![Remove_heap.png](/img/Remove_heap.png)
+
+And the output of previous code will be:
+
+```bash
+[Heap] Removing one node from minHeap [1 2 5 8 7 6]..
+[Heap] MinHeap after removing element 2 :[1 6 5 8 7]
+```
 
 Here is mainly all the thing that I want to talk about package `Heap`. The complete example code can be found in my repo: [lz-nsz/go-example/heap](https://github.com/lz-nsc/go-example/tree/main/heap)

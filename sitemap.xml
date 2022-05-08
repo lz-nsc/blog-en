@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>http://lzreload.com/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/</loc>
+    
+    <lastmod>2022-05-08</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://lzreload.com/en/2022/04/15/Golang-Heap/</loc>
+    
+    <lastmod>2022-04-19</lastmod>
+    
+  </url>
+  
+
+  <url>
+    <loc>http://lzreload.com/en</loc>
+    <lastmod>2022-05-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  
+  <url>
+    <loc>http://lzreload.com/en/tags/Kubernetes/</loc>
+    <lastmod>2022-05-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://lzreload.com/en/tags/Golang/</loc>
+    <lastmod>2022-05-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+
+  
+</urlset>

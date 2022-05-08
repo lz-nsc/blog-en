@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="UTF-8">
+  <meta 
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta 
+    http-equiv="X-UA-Compatible" 
+    content="ie=edge">
+  <meta 
+    name="theme-color" 
+    content="#fff" 
+    id="theme-color">
+  <meta 
+    name="description" 
+    content="Lynn&#39;s Blog">
+  <link 
+    rel="icon" 
+    href="/en/img/logo.png">
+  <title>Go: About package heap</title>
+  
+    
+      <meta 
+        property="og:title" 
+        content="Go: About package heap">
+    
+    
+      <meta 
+        property="og:url" 
+        content="http://lzreload.com/en/2022/04/15/Golang-Heap/index.html">
+    
+    
+      <meta 
+        property="og:img" 
+        content="/img/author.png">
+    
+    
+    
+      <meta 
+        property="og:type" 
+        content="article">
+      <meta 
+        property="og:article:published_time" 
+        content="2022-04-15">
+      <meta 
+        property="og:article:modified_time" 
+        content="2022-04-19">
+      <meta 
+        property="og:article:author" 
+        content="lz-nsc">
+      
+        
+          <meta 
+            property="og:article:tag" 
+            content="Golang">
+        
+      
+    
+  
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+    function loadCSS(href, data, attr) {
+      var sheet = document.createElement('link');
+      sheet.ref = 'stylesheet';
+      sheet.href = href;
+      sheet.dataset[data] = attr;
+      document.head.appendChild(sheet);
+    }
+    function changeCSS(cssFile, data, attr) {
+      var oldlink = document.querySelector(data);
+      var newlink = document.createElement("link");
+      newlink.setAttribute("rel", "stylesheet");
+      newlink.setAttribute("href", cssFile);
+      newlink.dataset.prism = attr;
+      document.head.replaceChild(newlink, oldlink);
+    }
+  </script>
+  
+    
+      
+      
+      
+      
+        
+        
+        
+        <script>
+          function prismThemeChange() {
+            if(document.getElementById('theme-color').dataset.mode === 'dark') {
+              if(document.querySelector('[data-prism]')) {
+                changeCSS('/en/js/lib/prism/prism-tomorrow.min.css', '[data-prism]', 'prism-tomorrow');
+              } else {
+                loadCSS('/en/js/lib/prism/prism-tomorrow.min.css', 'prism', 'prism-tomorrow');
+              }
+            } else {
+              if(document.querySelector('[data-prism]')) {
+                changeCSS('/en/js/lib/prism/prism.min.css', '[data-prism]', 'prism');
+              } else {
+                loadCSS('/en/js/lib/prism/prism.min.css', 'prism', 'prism');
+              }
+            }
+          }
+          prismThemeChange()
+        </script>
+      
+      
+        
+        <link rel="stylesheet" href="/en/js/lib/prism/prism-line-numbers.min.css">
+      
+    
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+  </script>
+  
+    <script>
+      var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+        document.getElementById('theme-color').dataset.mode = setting;
+        prismThemeChange();
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+        document.getElementById('theme-color').dataset.mode = setting;
+        prismThemeChange();
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+        document.getElementById('theme-color').dataset.mode = getCssMediaQuery();
+        prismThemeChange();
+      }
+    };
+    setDarkmode();
+    </script>
+  
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  
+    <link rel="preload" href="/en/js/lib/lightbox/baguetteBox.min.js" as="script">
+    <link rel="preload" href="/en/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+    <link rel="preload" href="/en/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+    
+    <link rel="prefetch" href="//unpkg.com/valine/dist/Valine.min.js" as="script">
+  
+  
+  
+  <link rel="stylesheet" href="/en/css/main.css">
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+  
+    <link rel="stylesheet" href="/en/js/lib/lightbox/baguetteBox.min.css">
+  
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/en/atom.xml" title="Lynn's Blog" type="application/atom+xml">
+</head>
+
+  <body>
+    <div class="wrapper">
+       
+      <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+        <img 
+          class="navbar-logo-img"
+          width="32"
+          height="32"
+          src="/en/img/logo.png" 
+          alt="blog logo">
+      
+      <span class="navbar-logo-dsc">Lynn's blog</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+      <a 
+        href="/en/" 
+        class="navbar-menu-item">
+        
+          Home
+        
+      </a>
+    
+      <a 
+        href="/en/archives" 
+        class="navbar-menu-item">
+        
+          Archive
+        
+      </a>
+    
+      <a 
+        href="/en/tags" 
+        class="navbar-menu-item">
+        
+          Tags
+        
+      </a>
+    
+      <a 
+        href="/en/categories" 
+        class="navbar-menu-item">
+        
+          Categories
+        
+      </a>
+    
+      <a 
+        href="/en/about" 
+        class="navbar-menu-item">
+        
+          About
+        
+      </a>
+    
+      <a 
+        href="/en/links" 
+        class="navbar-menu-item">
+        
+          Friends
+        
+      </a>
+    
+      <a 
+        href="http://lzreload.com/" 
+        class="navbar-menu-item">
+        
+          中文
+        
+      </a>
+    
+    <a 
+      class="navbar-menu-item darknavbar" 
+      id="dark">
+      <i class="iconfont icon-weather"></i>
+    </a>
+    <a 
+      class="navbar-menu-item searchnavbar" 
+      id="search">
+      <i 
+        class="iconfont icon-search" 
+        style="font-size: 1.2rem; font-weight: 400;">
+      </i>
+    </a>
+  </div>
+</nav> 
+      
+      <div 
+        id="local-search" 
+        style="display: none">
+        <input
+          class="navbar-menu-item"
+          id="search-input"
+          placeholder="请输入搜索内容..." />
+        <div id="search-content"></div>
+      </div>
+      
+      <div class="section-wrap">
+        <div class="container">
+          <div class="columns">
+            <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      Go: About package heap
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-04-15T09:21:52.000Z">
+      <i 
+        class="iconfont icon-calendar" 
+        style="margin-right: 2px;">
+      </i>
+      <span>2022-04-15</span>
+    </time>
+    
+    
+      <span class="dot"></span>
+      <span>1.6k words</span>
+    
+  </div>
+  
+    <div 
+      class="post-meta post-show-meta" 
+      style="margin-top: -10px;">
+      <div style="display: flex; align-items: center;">
+        <i 
+          class="iconfont icon-biaoqian" 
+          style="margin-right: 2px; font-size: 1.15rem;">
+        </i>
+        
+          
+          <a 
+            href="/en/tags/Golang/" 
+            class="post-meta-link">
+            Golang
+          </a>
+        
+      </div>
+    </div>
+  
+  </header>
+  <div 
+    id="section" 
+    class="post-content">
+    <h2 id="Interfaces"><a href="#Interfaces" class="headerlink" title="Interfaces"></a>Interfaces</h2><p>Package <code>heap</code> defines <code>Interface</code> which contains <code>Interface</code> of package <code>sort</code>, and two methods: Push and Pop.</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// go1.18.1/src/container/heap/heap.go</span>
+<span class="token keyword">package</span> heap
+
+<span class="token keyword">import</span> <span class="token string">"sort"</span>
+
+<span class="token keyword">type</span> Interface <span class="token keyword">interface</span> <span class="token punctuation">&#123;</span>
+	sort<span class="token punctuation">.</span>Interface
+	<span class="token function">Push</span><span class="token punctuation">(</span>x any<span class="token punctuation">)</span> <span class="token comment">// add x as element Len()</span>
+	<span class="token function">Pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> any   <span class="token comment">// remove and return element Len() - 1.</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>Interface</code> of package <code>sort</code> has 3 methods: Len, Less and Swap :</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> sort
+
+<span class="token comment">// An implementation of Interface can be sorted by the routines in this package.</span>
+<span class="token comment">// The methods refer to elements of the underlying collection by integer index.</span>
+<span class="token keyword">type</span> Interface <span class="token keyword">interface</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// Len is the number of elements in the collection.</span>
+	<span class="token function">Len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span>
+
+	<span class="token comment">// Less reports whether the element with index i</span>
+	<span class="token comment">// must sort before the element with index j.</span>
+	<span class="token function">Less</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">bool</span>
+
+	<span class="token comment">// Swap swaps the elements with indexes i and j.</span>
+	<span class="token function">Swap</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token builtin">int</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>It mains that in order to implement <code>Interface</code> of package heap, our structure should have 5 methods: Len, Less, Swap, Push and Pop.</p>
+<p>For example:</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">type</span> MinHeap <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">int</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m MinHeap<span class="token punctuation">)</span> <span class="token function">Less</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">return</span> m<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;=</span> m<span class="token punctuation">[</span>j<span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m MinHeap<span class="token punctuation">)</span> <span class="token function">Len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">return</span> <span class="token function">len</span><span class="token punctuation">(</span>m<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m MinHeap<span class="token punctuation">)</span> <span class="token function">Swap</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	m<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> m<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> m<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">,</span> m<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>MinHeap<span class="token punctuation">)</span> <span class="token function">Push</span><span class="token punctuation">(</span>x any<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token operator">*</span>m <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span><span class="token operator">*</span>m<span class="token punctuation">,</span> x<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>m <span class="token operator">*</span>MinHeap<span class="token punctuation">)</span> <span class="token function">Pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> any <span class="token punctuation">&#123;</span>
+	size <span class="token operator">:=</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token operator">*</span>m<span class="token punctuation">)</span>
+	last <span class="token operator">:=</span> <span class="token punctuation">(</span><span class="token operator">*</span>m<span class="token punctuation">)</span><span class="token punctuation">[</span>size<span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+	<span class="token operator">*</span>m <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token operator">*</span>m<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span>size<span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+	<span class="token keyword">return</span> last
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Above is a new structure named MinHeap which implements all the methods of <code>Interface</code> in package <code>heap</code>.</p>
+<p>Now that we’ve already defined a structure which has all these 5 methods, how do we use this package and how does this package work?</p>
+<h2 id="Functions"><a href="#Functions" class="headerlink" title="Functions"></a>Functions</h2><p>There are 5 public functions in this package:</p>
+<h3 id="Init"><a href="#Init" class="headerlink" title="Init"></a>Init</h3><p><code>Init</code> function will build a heap with given <code>Interface</code> who contains all the data.</p>
+<p>According to the code from this package, <code>Init</code> will perform bottom-up construction in order to build the heap from array with O(n) time complexity. </p>
+<ul>
+<li>It will start from the last non-leaf node and swap it with its smallest child if this subtree does not meet the requirement of <code>Minheap</code>(In this example, we defined a minHeap, whose requirement is the parent node must smaller than all its childs). Here it will call the <code>Less</code> and <code>Swap</code> function which we defined for the <code>MinHeap</code> previously in order to compare and swap two nodes.</li>
+<li>Then it will move to the next non-leaf node and keep swapping until the whole tree become a <code>MinHeap</code></li>
+</ul>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">Init</span><span class="token punctuation">(</span>h Interface<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// heapify</span>
+	n <span class="token operator">:=</span> h<span class="token punctuation">.</span><span class="token function">Len</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> n<span class="token operator">/</span><span class="token number">2</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">;</span> i<span class="token operator">--</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">down</span><span class="token punctuation">(</span>h<span class="token punctuation">,</span> i<span class="token punctuation">,</span> n<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">func</span> <span class="token function">down</span><span class="token punctuation">(</span>h Interface<span class="token punctuation">,</span> i0<span class="token punctuation">,</span> n <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+	i <span class="token operator">:=</span> i0
+	<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+		j1 <span class="token operator">:=</span> <span class="token number">2</span><span class="token operator">*</span>i <span class="token operator">+</span> <span class="token number">1</span>
+		<span class="token keyword">if</span> j1 <span class="token operator">>=</span> n <span class="token operator">||</span> j1 <span class="token operator">&lt;</span> <span class="token number">0</span> <span class="token punctuation">&#123;</span> <span class="token comment">// j1 &lt; 0 after int overflow</span>
+			<span class="token keyword">break</span>
+		<span class="token punctuation">&#125;</span>
+		j <span class="token operator">:=</span> j1 <span class="token comment">// left child</span>
+		<span class="token keyword">if</span> j2 <span class="token operator">:=</span> j1 <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span> j2 <span class="token operator">&lt;</span> n <span class="token operator">&amp;&amp;</span> h<span class="token punctuation">.</span><span class="token function">Less</span><span class="token punctuation">(</span>j2<span class="token punctuation">,</span> j1<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			j <span class="token operator">=</span> j2 <span class="token comment">// = 2*i + 2  // right child</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token keyword">if</span> <span class="token operator">!</span>h<span class="token punctuation">.</span><span class="token function">Less</span><span class="token punctuation">(</span>j<span class="token punctuation">,</span> i<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">break</span>
+		<span class="token punctuation">&#125;</span>
+		h<span class="token punctuation">.</span><span class="token function">Swap</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j<span class="token punctuation">)</span>
+		i <span class="token operator">=</span> j
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> i <span class="token operator">></span> i0
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>With the <code>MinHeap</code> struct which we’ve just define before:</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"[Heap] Start heap tast, creating original array ..."</span><span class="token punctuation">)</span>
+	mh <span class="token operator">:=</span> <span class="token operator">&amp;</span>MinHeap<span class="token punctuation">&#123;</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">&#125;</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] Original array :%v\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"[Heap] Start to build minHeap..."</span><span class="token punctuation">)</span>
+	heap<span class="token punctuation">.</span><span class="token function">Init</span><span class="token punctuation">(</span>mh<span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] MinHeap:%v\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	<span class="token operator">...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The <code>Init</code> function will build the heap like this:</p>
+<p><img src="/img/build_heap.png" alt="build_heap.png" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="/img/build_heap.png" class="lozad post-image"></p>
+<p>The output of previous code will be:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ go run main.go
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> Start heap tast, creating original array <span class="token punctuation">..</span>.
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> Original array :<span class="token punctuation">[</span><span class="token number">5</span> <span class="token number">3</span> <span class="token number">7</span> <span class="token number">8</span> <span class="token number">2</span> <span class="token number">1</span><span class="token punctuation">]</span>
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> Start to build minHeap<span class="token punctuation">..</span>.
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> MinHeap:<span class="token punctuation">[</span><span class="token number">1</span> <span class="token number">2</span> <span class="token number">5</span> <span class="token number">8</span> <span class="token number">3</span> <span class="token number">7</span><span class="token punctuation">]</span>
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="Pop"><a href="#Pop" class="headerlink" title="Pop"></a>Pop</h3><p><code>Pop</code> function will swap the root with the last node of the array and shorten the length of current array in order to exclude this minimum data in the upcoming action.</p>
+<p>Then it will move the current root down in order to build a new <code>MinHeap</code>.</p>
+<p>After that, this function will call the <code>Pop</code> function we defined for the <code>MinHeap</code> struct before to return the last node which is the minimum data in the structure:</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Pop removes and returns the minimum element (according to Less) from the heap.</span>
+<span class="token comment">// The complexity is O(log n) where n = h.Len().</span>
+<span class="token comment">// Pop is equivalent to Remove(h, 0).</span>
+<span class="token keyword">func</span> <span class="token function">Pop</span><span class="token punctuation">(</span>h Interface<span class="token punctuation">)</span> any <span class="token punctuation">&#123;</span>
+	n <span class="token operator">:=</span> h<span class="token punctuation">.</span><span class="token function">Len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
+	h<span class="token punctuation">.</span><span class="token function">Swap</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> n<span class="token punctuation">)</span>
+	<span class="token function">down</span><span class="token punctuation">(</span>h<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> n<span class="token punctuation">)</span>
+	<span class="token keyword">return</span> h<span class="token punctuation">.</span><span class="token function">Pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Still, with the same <code>MinHeap</code> struct:</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token operator">...</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] MinHeap:%v\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	first <span class="token operator">:=</span> heap<span class="token punctuation">.</span><span class="token function">Pop</span><span class="token punctuation">(</span>mh<span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] Pop:%d MinHeap:%v\n"</span><span class="token punctuation">,</span> first<span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	<span class="token operator">...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The <code>Pop</code> function will process the <code>Minheap</code> as:</p>
+<p><img src="/img/pop_heap.png" alt="pop_heap.png" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="/img/pop_heap.png" class="lozad post-image"></p>
+<p>The output of previous code will be:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token punctuation">..</span>.
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> MinHeap:<span class="token punctuation">[</span><span class="token number">1</span> <span class="token number">2</span> <span class="token number">5</span> <span class="token number">8</span> <span class="token number">3</span> <span class="token number">7</span><span class="token punctuation">]</span>
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> Pop:1 MinHeap:<span class="token punctuation">[</span><span class="token number">2</span> <span class="token number">3</span> <span class="token number">5</span> <span class="token number">8</span> <span class="token number">7</span><span class="token punctuation">]</span>
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="Push"><a href="#Push" class="headerlink" title="Push"></a>Push</h3><p><code>Push</code> function will first call the <code>Push</code> method of the given interface(<code>MinHeap</code>) in order to put the new node to the end of the array.</p>
+<p>Then it will keep moving this new node up using <code>MinHeap</code>‘s <code>Less</code> and <code>Swap</code> methods to make sure that the new array still meets the requirement of <code>MinHeap</code>.</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Push pushes the element x onto the heap.</span>
+<span class="token comment">// The complexity is O(log n) where n = h.Len().</span>
+<span class="token keyword">func</span> <span class="token function">Push</span><span class="token punctuation">(</span>h Interface<span class="token punctuation">,</span> x any<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	h<span class="token punctuation">.</span><span class="token function">Push</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+	<span class="token function">up</span><span class="token punctuation">(</span>h<span class="token punctuation">,</span> h<span class="token punctuation">.</span><span class="token function">Len</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token function">up</span><span class="token punctuation">(</span>h Interface<span class="token punctuation">,</span> j <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+		i <span class="token operator">:=</span> <span class="token punctuation">(</span>j <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">2</span> <span class="token comment">// parent</span>
+		<span class="token keyword">if</span> i <span class="token operator">==</span> j <span class="token operator">||</span> <span class="token operator">!</span>h<span class="token punctuation">.</span><span class="token function">Less</span><span class="token punctuation">(</span>j<span class="token punctuation">,</span> i<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">break</span>
+		<span class="token punctuation">&#125;</span>
+		h<span class="token punctuation">.</span><span class="token function">Swap</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> j<span class="token punctuation">)</span>
+		j <span class="token operator">=</span> i
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>With the same <code>MinHeap</code> struct:</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token operator">...</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] MinHeap:%v\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	first <span class="token operator">:=</span> heap<span class="token punctuation">.</span><span class="token function">Pop</span><span class="token punctuation">(</span>mh<span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] Pop:%d MinHeap:%v\n"</span><span class="token punctuation">,</span> first<span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	heap<span class="token punctuation">.</span><span class="token function">Push</span><span class="token punctuation">(</span>mh<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] Push:%d MinHeap:%v\n"</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	<span class="token operator">...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The <code>Push</code> function will process like this:</p>
+<p><img src="/img/push_heap.png" alt="push_heap.png" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="/img/push_heap.png" class="lozad post-image"></p>
+<p>And the output of previous code will be:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token punctuation">..</span>.
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> MinHeap:<span class="token punctuation">[</span><span class="token number">1</span> <span class="token number">2</span> <span class="token number">5</span> <span class="token number">8</span> <span class="token number">3</span> <span class="token number">7</span><span class="token punctuation">]</span>
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> Pop:1 MinHeap:<span class="token punctuation">[</span><span class="token number">2</span> <span class="token number">3</span> <span class="token number">5</span> <span class="token number">8</span> <span class="token number">7</span><span class="token punctuation">]</span>
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> Push:4 MinHeap:<span class="token punctuation">[</span><span class="token number">2</span> <span class="token number">3</span> <span class="token number">4</span> <span class="token number">8</span> <span class="token number">7</span> <span class="token number">5</span><span class="token punctuation">]</span>
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="Fix"><a href="#Fix" class="headerlink" title="Fix"></a>Fix</h3><p><code>Fix</code> function of package heap can be used when one of the node’s value is changed. In this situation, we don’t need to use Init to rebuild the whole tree, we only need to move this node down/up in order to make the array to meet the requirement again:</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Fix re-establishes the heap ordering after the element at index i has changed its value.</span>
+<span class="token comment">// Changing the value of the element at index i and then calling Fix is equivalent to,</span>
+<span class="token comment">// but less expensive than, calling Remove(h, i) followed by a Push of the new value.</span>
+<span class="token comment">// The complexity is O(log n) where n = h.Len().</span>
+<span class="token keyword">func</span> <span class="token function">Fix</span><span class="token punctuation">(</span>h Interface<span class="token punctuation">,</span> i <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">if</span> <span class="token operator">!</span><span class="token function">down</span><span class="token punctuation">(</span>h<span class="token punctuation">,</span> i<span class="token punctuation">,</span> h<span class="token punctuation">.</span><span class="token function">Len</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">up</span><span class="token punctuation">(</span>h<span class="token punctuation">,</span> i<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>down</code> function will return a boolean value to indicate whether the position of target node has been changed in previous process. If not, it means that it might need to move up.</p>
+<p>For example:</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token operator">...</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] Changing one node of minHeap %v..\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token operator">*</span>mh<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">6</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] MinHeap will be fixed:%v\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	heap<span class="token punctuation">.</span><span class="token function">Fix</span><span class="token punctuation">(</span>mh<span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] MinHeap after fix:%v\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] Changing one node of minHeap %v..\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	<span class="token punctuation">(</span><span class="token operator">*</span>mh<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1</span>
+	heap<span class="token punctuation">.</span><span class="token function">Fix</span><span class="token punctuation">(</span>mh<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] MinHeap after fix:%v\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	<span class="token operator">...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The <code>Fix</code> function will process like this:</p>
+<p><img src="/img/Fix_heap.png" alt="Fix_heap.png" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="/img/Fix_heap.png" class="lozad post-image"></p>
+<p>And the output of previous code will be:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> Changing one node of minHeap <span class="token punctuation">[</span><span class="token number">2</span> <span class="token number">3</span> <span class="token number">4</span> <span class="token number">8</span> <span class="token number">7</span> <span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">..</span>
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> MinHeap will be fixed:<span class="token punctuation">[</span><span class="token number">2</span> <span class="token number">3</span> <span class="token number">6</span> <span class="token number">8</span> <span class="token number">7</span> <span class="token number">5</span><span class="token punctuation">]</span>
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> MinHeap after fix:<span class="token punctuation">[</span><span class="token number">2</span> <span class="token number">3</span> <span class="token number">5</span> <span class="token number">8</span> <span class="token number">7</span> <span class="token number">6</span><span class="token punctuation">]</span>
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> Changing one node of minHeap <span class="token punctuation">[</span><span class="token number">2</span> <span class="token number">3</span> <span class="token number">5</span> <span class="token number">8</span> <span class="token number">7</span> <span class="token number">6</span><span class="token punctuation">]</span><span class="token punctuation">..</span>
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> MinHeap after fix:<span class="token punctuation">[</span><span class="token number">1</span> <span class="token number">2</span> <span class="token number">5</span> <span class="token number">8</span> <span class="token number">7</span> <span class="token number">6</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="Remove"><a href="#Remove" class="headerlink" title="Remove"></a>Remove</h3><p><code>Remove</code> function is a bit like the combination of <code>Pop</code> and <code>Fix</code>.</p>
+<ul>
+<li>It will shorten the length of the array in order to exclude the last node in the tree (which will be change to the target node in next step)</li>
+<li>Then it will swap the target node with the last node.</li>
+<li>Coz the value the previous position of target node holds has been changed, this function will act like <code>Fix</code> function to make the array to meet the requirement again.</li>
+<li>Finally it will pop out the current last node which is the target node as well.</li>
+</ul>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Remove removes and returns the element at index i from the heap.</span>
+<span class="token comment">// The complexity is O(log n) where n = h.Len().</span>
+<span class="token keyword">func</span> <span class="token function">Remove</span><span class="token punctuation">(</span>h Interface<span class="token punctuation">,</span> i <span class="token builtin">int</span><span class="token punctuation">)</span> any <span class="token punctuation">&#123;</span>
+	n <span class="token operator">:=</span> h<span class="token punctuation">.</span><span class="token function">Len</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span>
+	<span class="token keyword">if</span> n <span class="token operator">!=</span> i <span class="token punctuation">&#123;</span>
+		h<span class="token punctuation">.</span><span class="token function">Swap</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> n<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> <span class="token operator">!</span><span class="token function">down</span><span class="token punctuation">(</span>h<span class="token punctuation">,</span> i<span class="token punctuation">,</span> n<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token function">up</span><span class="token punctuation">(</span>h<span class="token punctuation">,</span> i<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> h<span class="token punctuation">.</span><span class="token function">Pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>For example: </p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+	<span class="token operator">...</span>
+	<span class="token comment">//Remove</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] Removing one node from minHeap %v..\n"</span><span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	elem <span class="token operator">:=</span> heap<span class="token punctuation">.</span><span class="token function">Remove</span><span class="token punctuation">(</span>mh<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"[Heap] MinHeap after removing element %d :%v\n"</span><span class="token punctuation">,</span> elem<span class="token punctuation">,</span> <span class="token operator">*</span>mh<span class="token punctuation">)</span>
+	<span class="token operator">...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The <code>Remove</code> function will process like this:</p>
+<p><img src="/img/Remove_heap.png" alt="Remove_heap.png" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="/img/Remove_heap.png" class="lozad post-image"></p>
+<p>And the output of previous code will be:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> Removing one node from minHeap <span class="token punctuation">[</span><span class="token number">1</span> <span class="token number">2</span> <span class="token number">5</span> <span class="token number">8</span> <span class="token number">7</span> <span class="token number">6</span><span class="token punctuation">]</span><span class="token punctuation">..</span>
+<span class="token punctuation">[</span>Heap<span class="token punctuation">]</span> MinHeap after removing element <span class="token number">2</span> :<span class="token punctuation">[</span><span class="token number">1</span> <span class="token number">6</span> <span class="token number">5</span> <span class="token number">8</span> <span class="token number">7</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>Here is mainly all the thing that I want to talk about package <code>Heap</code>. The complete example code can be found in my repo: <a target="_blank" rel="noopener" href="https://github.com/lz-nsc/go-example/tree/main/heap">lz-nsz/go-example/heap</a></p>
+
+  </div>
+  <div>
+    
+      <div 
+        class="post-note note-warning copyright" 
+        style="margin-top: 42px">
+        <p>
+          <span style="font-weight: bold;">作者：</span><a 
+            target="_blank" 
+            rel="nofollow noopener noreferrer" 
+            href="/en/about">
+            lz-nsc
+          </a>
+        </p>
+        <p>
+          <span style="font-weight: bold;">文章链接：</span><a 
+            target="_blank" 
+            rel="nofollow noopener noreferrer" 
+            href="http://lzreload.com/en/2022/04/15/Golang-Heap/">
+            http://lzreload.com/en/2022/04/15/Golang-Heap/
+          </a>
+        </p>
+        <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+      </div>
+    
+  </div>
+</article>
+<div class="nav">
+  
+    <div class="nav-item-prev">
+      <a 
+        href="/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/" 
+        class="nav-link">
+        <i class="iconfont icon-left nav-prev-icon"></i>
+        <div>
+          <div class="nav-label">Prev</div>
+          
+            <div class="nav-title">About Kubernetes configuration: ConfigMap </div>
+          
+        </div>
+      </a>
+    </div>
+  
+  
+</div>
+
+  <div 
+    class="card card-content comment-card" 
+    style="margin-top: 16px;">
+    <div class="comment-card-title">评论</div>
+    
+  <div id="vcomments"></div>
+  
+  <script>
+    loadScript("//unpkg.com/valine/dist/Valine.min.js");
+    var oldLoadVa = window.onload;
+    window.onload = function () {
+      oldLoadVa && oldLoadVa();
+      new Valine({
+        el: '#vcomments',
+        appId: '6AA1gXvoIRhGdQhCpYejA0Us-gzGzoHsz',
+        appKey: 'OyxvagUt7NEgTT0JB4WwWIzx',
+        placeholder: 'Comment',
+        path: window.location.pathname,
+        avatar: 'mp',
+        meta: ["nick","mail","link"],
+        pageSize: '10',
+        lang: '',
+        visitor: 'false',
+        highlight: true,
+        recordIP: true,
+        
+        
+        
+        enableQQ: 'false',
+        requiredFields: [],
+      });
+    };
+  </script>
+
+  </div>
+
+<div 
+  class="card card-content toc-card" 
+  id="mobiletoc">
+  <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>TOC
+</div>
+<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Interfaces"><span class="toc-text">Interfaces</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Functions"><span class="toc-text">Functions</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Init"><span class="toc-text">Init</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pop"><span class="toc-text">Pop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Push"><span class="toc-text">Push</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Fix"><span class="toc-text">Fix</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Remove"><span class="toc-text">Remove</span></a></li></ol></li></ol>
+</div></main>
+            <aside class="left-column">
+              
+              <div class="card card-author">
+                
+  <img 
+    src="/img/author.png" 
+    class="author-img"
+    width="88"
+    height="88"
+    alt="author avatar">
+
+<p class="author-name">lz-nsc</p>
+<p class="author-description"></p>
+<div class="author-message">
+  <a 
+    class="author-posts-count" 
+    href="/en/archives">
+    <span>2</span>
+    <span>Posts</span>
+  </a>
+  <a 
+    class="author-categories-count" 
+    href="/en/categories">
+    <span>0</span>
+    <span>Categories</span>
+  </a>
+  <a 
+    class="author-tags-count" 
+    href="/en/tags">
+    <span>2</span>
+    <span>Tags</span>
+  </a>
+</div>
+
+              </div>
+               <div class="sticky-tablet">
+  
+  
+    <article class="display-when-two-columns spacer">
+      <div class="card card-content toc-card">
+        <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>TOC
+</div>
+<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Interfaces"><span class="toc-text">Interfaces</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Functions"><span class="toc-text">Functions</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Init"><span class="toc-text">Init</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pop"><span class="toc-text">Pop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Push"><span class="toc-text">Push</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Fix"><span class="toc-text">Fix</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Remove"><span class="toc-text">Remove</span></a></li></ol></li></ol>
+      </div>
+    </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header">
+    <i 
+      class="iconfont icon-fenlei" 
+      style="padding-right: 2px;">
+    </i>Categories
+  </div>
+  <div class="categories-list">
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header">
+    <i 
+      class="iconfont icon-biaoqian" 
+      style="padding-right: 2px;">
+    </i>hot tags
+  </div>
+  <div class="tags-list">
+    
+      <a 
+        href="/en/tags/Golang/" 
+        title="Golang">
+        <div class="tags-list-item">Golang</div>
+      </a>
+    
+      <a 
+        href="/en/tags/Kubernetes/" 
+        title="Kubernetes">
+        <div class="tags-list-item">Kubernetes</div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+            </aside>
+            <aside class="right-column">
+              <div class="sticky-widescreen">
+  
+  
+    <article class="card card-content toc-card">
+      <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>TOC
+</div>
+<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Interfaces"><span class="toc-text">Interfaces</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Functions"><span class="toc-text">Functions</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Init"><span class="toc-text">Init</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pop"><span class="toc-text">Pop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Push"><span class="toc-text">Push</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Fix"><span class="toc-text">Fix</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Remove"><span class="toc-text">Remove</span></a></li></ol></li></ol>
+    </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header">
+    <i 
+      class="iconfont icon-wenzhang_huaban" 
+      style="padding-right: 2px;">
+    </i>Recent Posts
+  </div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-05-08</div>
+        <a href="/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/"><div class="recent-posts-item-content">About Kubernetes configuration: ConfigMap</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-04-15</div>
+        <a href="/en/2022/04/15/Golang-Heap/"><div class="recent-posts-item-content">Go: About package heap</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+     
+    <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>
+          Copyright ©
+          
+            2022
+          
+          
+        </span>
+        &nbsp;
+        <a 
+          href="/en/" 
+          class="footer-link">
+          Lynn's blog
+        </a>
+      </div>
+    </div>
+
+    
+      <div class="footer-dsc">
+        
+          Powered by
+          <a 
+            href="https://hexo.io/" 
+            class="footer-link" 
+            target="_blank" 
+            rel="nofollow noopener noreferrer">
+            &nbsp;Hexo
+          </a>
+        
+        
+        
+      </div>
+    
+    
+    
+    
+      <div class="footer-dsc">
+        
+          本站总访问量<span id="busuanzi_value_site_pv"></span>次
+        
+        
+          <span>&nbsp;|&nbsp;</span>
+        
+        
+          本站总访客数<span id="busuanzi_value_site_uv"></span>次
+        
+      </div>
+      
+    
+</footer>
+ 
+    
+  <a 
+    role="button" 
+    id="scrollbutton" 
+    class="basebutton" 
+    aria-label="回到顶部">
+    <i class="iconfont icon-arrowleft button-icon"></i>
+  </a>
+
+<a 
+  role="button" 
+  id="menubutton"
+  aria-label="menu button"
+  class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="popbutton" 
+  class="basebutton" 
+  aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="darkbutton" 
+  class="basebutton darkwidget" 
+  aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="searchbutton" 
+  class="basebutton searchwidget" 
+  aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a> 
+     
+     
+     
+      <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img')
+    var i
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a')
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'))
+      wrapper.setAttribute('aria-label', 'illustration')
+      wrapper.style.cssText =
+        'width: 100%; display: flex; justify-content: center;'
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt
+      wrapper.dataset.nolink = true
+      img[i].before(wrapper)
+      wrapper.append(img[i])
+      var divWrap = document.createElement('div')
+      divWrap.classList.add('gallery')
+      wrapper.before(divWrap)
+      divWrap.append(wrapper)
+    }
+    baguetteBox.run('.gallery')
+  }
+</script>
+<script>
+  loadScript(
+    "/en/js/lib/lightbox/baguetteBox.min.js",
+    addImgLayout
+  )
+</script>
+ 
+     
+     
+    <script src="/en/js/main.js"></script> 
+    
+      <script> 
+        loadScript('/en/js/lib/busuanzi.min.js') 
+      </script>
+     
+    
+      <script>
+        var addLazyload = function () {
+          var observer = lozad('.lozad', {
+            load: function (el) {
+              el.srcset = el.getAttribute('data-src')
+            },
+            loaded: function (el) {
+              el.classList.add('loaded')
+            },
+          })
+          observer.observe()
+        }
+      </script>
+      <script>
+        loadScript('/en/js/lib/lozad.min.js', addLazyload)
+      </script>
+     
+    
+    
+  </body>
+</html>

@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="UTF-8">
+  <meta 
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta 
+    http-equiv="X-UA-Compatible" 
+    content="ie=edge">
+  <meta 
+    name="theme-color" 
+    content="#fff" 
+    id="theme-color">
+  <meta 
+    name="description" 
+    content="Lynn&#39;s Blog">
+  <link 
+    rel="icon" 
+    href="/en/img/logo.png">
+  <title>About Kubernetes configuration: ConfigMap</title>
+  
+    
+      <meta 
+        property="og:title" 
+        content="About Kubernetes configuration: ConfigMap">
+    
+    
+      <meta 
+        property="og:url" 
+        content="http://lzreload.com/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/index.html">
+    
+    
+      <meta 
+        property="og:img" 
+        content="/img/author.png">
+    
+    
+    
+      <meta 
+        property="og:type" 
+        content="article">
+      <meta 
+        property="og:article:published_time" 
+        content="2022-05-08">
+      <meta 
+        property="og:article:modified_time" 
+        content="2022-05-08">
+      <meta 
+        property="og:article:author" 
+        content="lz-nsc">
+      
+        
+          <meta 
+            property="og:article:tag" 
+            content="Kubernetes">
+        
+      
+    
+  
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+    function loadCSS(href, data, attr) {
+      var sheet = document.createElement('link');
+      sheet.ref = 'stylesheet';
+      sheet.href = href;
+      sheet.dataset[data] = attr;
+      document.head.appendChild(sheet);
+    }
+    function changeCSS(cssFile, data, attr) {
+      var oldlink = document.querySelector(data);
+      var newlink = document.createElement("link");
+      newlink.setAttribute("rel", "stylesheet");
+      newlink.setAttribute("href", cssFile);
+      newlink.dataset.prism = attr;
+      document.head.replaceChild(newlink, oldlink);
+    }
+  </script>
+  
+    
+      
+      
+      
+      
+        
+        
+        
+        <script>
+          function prismThemeChange() {
+            if(document.getElementById('theme-color').dataset.mode === 'dark') {
+              if(document.querySelector('[data-prism]')) {
+                changeCSS('/en/js/lib/prism/prism-tomorrow.min.css', '[data-prism]', 'prism-tomorrow');
+              } else {
+                loadCSS('/en/js/lib/prism/prism-tomorrow.min.css', 'prism', 'prism-tomorrow');
+              }
+            } else {
+              if(document.querySelector('[data-prism]')) {
+                changeCSS('/en/js/lib/prism/prism.min.css', '[data-prism]', 'prism');
+              } else {
+                loadCSS('/en/js/lib/prism/prism.min.css', 'prism', 'prism');
+              }
+            }
+          }
+          prismThemeChange()
+        </script>
+      
+      
+        
+        <link rel="stylesheet" href="/en/js/lib/prism/prism-line-numbers.min.css">
+      
+    
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+  </script>
+  
+    <script>
+      var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+        document.getElementById('theme-color').dataset.mode = setting;
+        prismThemeChange();
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+        document.getElementById('theme-color').dataset.mode = setting;
+        prismThemeChange();
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+        document.getElementById('theme-color').dataset.mode = getCssMediaQuery();
+        prismThemeChange();
+      }
+    };
+    setDarkmode();
+    </script>
+  
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  
+    <link rel="preload" href="/en/js/lib/lightbox/baguetteBox.min.js" as="script">
+    <link rel="preload" href="/en/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+    <link rel="preload" href="/en/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+    
+    <link rel="prefetch" href="//unpkg.com/valine/dist/Valine.min.js" as="script">
+  
+  
+  
+  <link rel="stylesheet" href="/en/css/main.css">
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+  
+    <link rel="stylesheet" href="/en/js/lib/lightbox/baguetteBox.min.css">
+  
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/en/atom.xml" title="Lynn's Blog" type="application/atom+xml">
+</head>
+
+  <body>
+    <div class="wrapper">
+       
+      <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+        <img 
+          class="navbar-logo-img"
+          width="32"
+          height="32"
+          src="/en/img/logo.png" 
+          alt="blog logo">
+      
+      <span class="navbar-logo-dsc">Lynn's blog</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+      <a 
+        href="/en/" 
+        class="navbar-menu-item">
+        
+          Home
+        
+      </a>
+    
+      <a 
+        href="/en/archives" 
+        class="navbar-menu-item">
+        
+          Archive
+        
+      </a>
+    
+      <a 
+        href="/en/tags" 
+        class="navbar-menu-item">
+        
+          Tags
+        
+      </a>
+    
+      <a 
+        href="/en/categories" 
+        class="navbar-menu-item">
+        
+          Categories
+        
+      </a>
+    
+      <a 
+        href="/en/about" 
+        class="navbar-menu-item">
+        
+          About
+        
+      </a>
+    
+      <a 
+        href="/en/links" 
+        class="navbar-menu-item">
+        
+          Friends
+        
+      </a>
+    
+      <a 
+        href="http://lzreload.com/" 
+        class="navbar-menu-item">
+        
+          中文
+        
+      </a>
+    
+    <a 
+      class="navbar-menu-item darknavbar" 
+      id="dark">
+      <i class="iconfont icon-weather"></i>
+    </a>
+    <a 
+      class="navbar-menu-item searchnavbar" 
+      id="search">
+      <i 
+        class="iconfont icon-search" 
+        style="font-size: 1.2rem; font-weight: 400;">
+      </i>
+    </a>
+  </div>
+</nav> 
+      
+      <div 
+        id="local-search" 
+        style="display: none">
+        <input
+          class="navbar-menu-item"
+          id="search-input"
+          placeholder="请输入搜索内容..." />
+        <div id="search-content"></div>
+      </div>
+      
+      <div class="section-wrap">
+        <div class="container">
+          <div class="columns">
+            <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      About Kubernetes configuration: ConfigMap
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-05-08T11:38:32.000Z">
+      <i 
+        class="iconfont icon-calendar" 
+        style="margin-right: 2px;">
+      </i>
+      <span>2022-05-08</span>
+    </time>
+    
+    
+      <span class="dot"></span>
+      <span>1.6k words</span>
+    
+  </div>
+  
+    <div 
+      class="post-meta post-show-meta" 
+      style="margin-top: -10px;">
+      <div style="display: flex; align-items: center;">
+        <i 
+          class="iconfont icon-biaoqian" 
+          style="margin-right: 2px; font-size: 1.15rem;">
+        </i>
+        
+          
+          <a 
+            href="/en/tags/Kubernetes/" 
+            class="post-meta-link">
+            Kubernetes
+          </a>
+        
+      </div>
+    </div>
+  
+  </header>
+  <div 
+    id="section" 
+    class="post-content">
+    <h1 id="Kubernete-Configuration-ConfigMap"><a href="#Kubernete-Configuration-ConfigMap" class="headerlink" title="Kubernete Configuration - ConfigMap"></a>Kubernete Configuration - ConfigMap</h1><h1 id="Creating-ConfigMap"><a href="#Creating-ConfigMap" class="headerlink" title="Creating ConfigMap"></a>Creating ConfigMap</h1><h2 id="Create-from-folder"><a href="#Create-from-folder" class="headerlink" title="Create from folder"></a>Create from folder</h2><p><code>kubectl create folder-cm --from-file &lt;folder_name&gt;</code></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Create with folder</span>
+$ kubectl create folder-cm --from-file config
+$ kubectl get cm/folder-cm -o yaml
+apiVersion: v1
+data:
+  config.txt: <span class="token operator">|</span>
+    <span class="token assign-left variable">Test</span><span class="token operator">=</span>test
+  test.txt: <span class="token operator">|</span>
+    <span class="token assign-left variable">DONT</span><span class="token operator">=</span>KNOW
+kind: ConfigMap
+metadata:
+  creationTimestamp: <span class="token string">"2022-05-02T15:53:44Z"</span>
+  name: folder-cm
+  namespace: default
+  resourceVersion: <span class="token string">"41428"</span>
+  uid: 9f71a652-2350-4d55-be6e-5ef468cd45f8
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Create-from-file"><a href="#Create-from-file" class="headerlink" title="Create from file"></a>Create from file</h2><p>💡Can create with multiple files, if create with all the files in the same folder, it’s same with creating from folder:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment">## Create with file</span>
+$ kubectl create cm file-cm --from-file config/config.txt --from-file config/test.txt
+$ kubectl get cm/file-cm -o yaml
+
+apiVersion: v1
+data:
+  config.txt: <span class="token operator">|</span>
+    <span class="token assign-left variable">Test</span><span class="token operator">=</span>test
+  test.txt: <span class="token operator">|</span>
+    <span class="token assign-left variable">DONT</span><span class="token operator">=</span>KNOW
+kind: ConfigMap
+metadata:
+  creationTimestamp: <span class="token string">"2022-05-02T16:03:36Z"</span>
+  name: file-cm
+  namespace: default
+  resourceVersion: <span class="token string">"42433"</span>
+  uid: 17766fc1-cfd5-4b95-b00f-296844f23407<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The name of the file will be the key of key-value pair in <code>ConfigMap</code> while the content of the file will be the value.</p>
+<p>If we want some specific keys, we can create the ConfigMap with given key:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ kubectl create cm key-cm --from-file<span class="token operator">=</span>key<span class="token operator">=</span>config.txt
+$ kubectl get cm/key-cm -o yaml
+apiVersion: v1
+data:
+  key: <span class="token operator">|</span>
+    <span class="token assign-left variable">DB_URL</span><span class="token operator">=</span>localhost:3306
+    <span class="token assign-left variable">DB_USERNAME</span><span class="token operator">=</span>postgres
+kind: ConfigMap
+metadata:
+  creationTimestamp: <span class="token string">"2022-05-03T15:16:25Z"</span>
+  name: key-cm
+  namespace: default
+  resourceVersion: <span class="token string">"63721"</span>
+  uid: eb3c93ca-fcfc-42bd-82ce-2d8cddbfc900<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Create-from-key-value-pairs"><a href="#Create-from-key-value-pairs" class="headerlink" title="Create from key-value pairs"></a>Create from key-value pairs</h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ kubectl create cm value-cm --from-literal<span class="token operator">=</span>Test<span class="token operator">=</span>test
+$ kubectl get cm/value-cm -o yaml
+apiVersion: v1
+data:
+  Test: <span class="token builtin class-name">test</span>
+kind: ConfigMap
+metadata:
+  creationTimestamp: <span class="token string">"2022-05-03T15:26:07Z"</span>
+  name: value-cm
+  namespace: default
+  resourceVersion: <span class="token string">"64703"</span>
+  uid: f5431bb3-6276-48e8-85e0-33b0ef1a7243<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Create-from-env-file"><a href="#Create-from-env-file" class="headerlink" title="Create from env file"></a>Create from env file</h2><p>💡env file can be .<code>env</code> file and <code>.txt</code> file and so on ..</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ kubectl create cm env-cm --from-env-file<span class="token operator">=</span>config.txt
+$ kubectl get cm/env-cm -o yaml
+apiVersion: v1
+data:
+  DB_URL: localhost:3306
+  DB_USERNAME: postgres
+kind: ConfigMap
+metadata:
+  creationTimestamp: <span class="token string">"2022-05-03T15:30:49Z"</span>
+  name: env-cm
+  namespace: default
+  resourceVersion: <span class="token string">"65184"</span>
+  uid: 60dba811-8fa9-4bb1-9e7b-9d45a02009eb<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Comparing with <code>Create from file</code>, in which same file is used to create configMap, instead of using filename/given key as key, and file content as value, <code>creating from env file</code> reads the file first, and uses <code>key-value pairs</code> in the file to create ConfigMap.</p>
+<h1 id="Using-configMap"><a href="#Using-configMap" class="headerlink" title="Using configMap"></a>Using configMap</h1><h2 id="Use-ConfigMap-as-files-in-pod"><a href="#Use-ConfigMap-as-files-in-pod" class="headerlink" title="Use ConfigMap as files in pod"></a>Use ConfigMap as files in pod</h2><h3 id="Mount-configMap"><a href="#Mount-configMap" class="headerlink" title="Mount configMap"></a>Mount configMap</h3><p>ConfigMap can be mounted to pods as volumes. Here is the yaml file of a pod who mounts all the ComfigMaps we’ve created above (folder-cm, file-cm, value-cm, env-cm):</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment"># file-pod.yaml</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Pod
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">creationTimestamp</span><span class="token punctuation">:</span> <span class="token null important">null</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> file<span class="token punctuation">-</span>pod
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">image</span><span class="token punctuation">:</span> nginx
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> pod
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">containerPort</span><span class="token punctuation">:</span> <span class="token number">80</span>
+    <span class="token key atrule">resources</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+    <span class="token key atrule">volumeMounts</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> folder
+      <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> <span class="token string">"folder"</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> file
+      <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> <span class="token string">"file"</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> value
+      <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> <span class="token string">"value"</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> env
+      <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> <span class="token string">"env"</span>
+  <span class="token key atrule">dnsPolicy</span><span class="token punctuation">:</span> ClusterFirst
+  <span class="token key atrule">restartPolicy</span><span class="token punctuation">:</span> Always
+  <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> folder
+    <span class="token key atrule">configMap</span><span class="token punctuation">:</span>
+      <span class="token key atrule">name</span><span class="token punctuation">:</span> folder<span class="token punctuation">-</span>cm
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> file
+    <span class="token key atrule">configMap</span><span class="token punctuation">:</span>
+      <span class="token key atrule">name</span><span class="token punctuation">:</span> file<span class="token punctuation">-</span>cm
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> value
+    <span class="token key atrule">configMap</span><span class="token punctuation">:</span>
+      <span class="token key atrule">name</span><span class="token punctuation">:</span> value<span class="token punctuation">-</span>cm
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> env
+    <span class="token key atrule">configMap</span><span class="token punctuation">:</span>
+      <span class="token key atrule">name</span><span class="token punctuation">:</span> env<span class="token punctuation">-</span>cm
+<span class="token key atrule">status</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Then if we log into the pod and check what is going on inside:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ kubectl <span class="token builtin class-name">exec</span> -it pod/file-pod -- <span class="token function">bash</span>
+<span class="token comment"># Inside pod</span>
+$ tree -L <span class="token number">2</span>
+<span class="token punctuation">..</span>.
+<span class="token operator">|</span>-- <span class="token function">env</span>
+<span class="token operator">|</span>   <span class="token operator">|</span>-- DB_URL -<span class="token operator">></span> <span class="token punctuation">..</span>data/DB_URL
+<span class="token operator">|</span>   <span class="token variable"><span class="token variable">`</span>-- DB_USERNAME -<span class="token operator">></span> <span class="token punctuation">..</span>data/DB_USERNAME
+<span class="token operator">|</span>-- <span class="token function">file</span>
+<span class="token operator">|</span>   <span class="token operator">|</span>-- config.txt -<span class="token operator">></span> <span class="token punctuation">..</span>data/config.txt
+<span class="token operator">|</span>   <span class="token variable">`</span></span>-- test.txt -<span class="token operator">></span> <span class="token punctuation">..</span>data/test.txt
+<span class="token operator">|</span>-- folder
+<span class="token operator">|</span>   <span class="token operator">|</span>-- config.txt -<span class="token operator">></span> <span class="token punctuation">..</span>data/config.txt
+<span class="token operator">|</span>   <span class="token variable"><span class="token variable">`</span>-- test.txt -<span class="token operator">></span> <span class="token punctuation">..</span>data/test.txt
+<span class="token operator">|</span>-- value
+<span class="token operator">|</span>   <span class="token variable">`</span></span>-- Test -<span class="token operator">></span> <span class="token punctuation">..</span>data/Test
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Apparently, no matter from what we created the <code>ConfigMap</code>, the pod who mounted them would generate a file for each key-value pairs in <code>ConfigMap</code> using key as filename and value as content.</p>
+<p>💡Mounting ConfigMap to pods as volumes is setting to <code>Read-Only</code> by default.</p>
+<h3 id="Mount-ConfigMap-with-SubPath"><a href="#Mount-ConfigMap-with-SubPath" class="headerlink" title="Mount ConfigMap with SubPath"></a>Mount ConfigMap with SubPath</h3><p>It’s mentioned that when we mount a <code>ConfigMap</code> to a pod, a folder named as what is specified in <code>spec.containers.volumeMounts.mountPath</code> in the yaml file will be created (if there’s already a folder with same name, the original folder will be covered and the files in this folder cannot been seen anymore.)</p>
+<p>But there will be a situation that we only want to create a file based on the <code>ConfigMap</code> and put it into a folder which already exited. </p>
+<p>For example, folder <code>/etc/nginx/conf.d</code> which already has a file <code>default.conf</code> for Nginx. Instead of making this file disappear, we only want to add a new file into this folder. Then we need <code>SubPath</code>:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment"># file-pod2</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Pod
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">creationTimestamp</span><span class="token punctuation">:</span> <span class="token null important">null</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> file<span class="token punctuation">-</span>pod2
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">image</span><span class="token punctuation">:</span> nginx
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> pod
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">containerPort</span><span class="token punctuation">:</span> <span class="token number">80</span>
+    <span class="token key atrule">resources</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+    <span class="token key atrule">volumeMounts</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> folder
+      <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> <span class="token string">"folder"</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> file
+      <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> <span class="token string">"/etc/nginx/conf.d/config.txt"</span>
+      <span class="token key atrule">subPath</span><span class="token punctuation">:</span> <span class="token string">"config.txt"</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> value
+      <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> <span class="token string">"value"</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> env
+      <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> <span class="token string">"env"</span>
+  <span class="token key atrule">dnsPolicy</span><span class="token punctuation">:</span> ClusterFirst
+  <span class="token key atrule">restartPolicy</span><span class="token punctuation">:</span> Always
+  <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> folder
+    <span class="token key atrule">configMap</span><span class="token punctuation">:</span>
+      <span class="token key atrule">name</span><span class="token punctuation">:</span> folder<span class="token punctuation">-</span>cm
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> file
+    <span class="token key atrule">configMap</span><span class="token punctuation">:</span>
+      <span class="token key atrule">name</span><span class="token punctuation">:</span> file<span class="token punctuation">-</span>cm
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> value
+    <span class="token key atrule">configMap</span><span class="token punctuation">:</span>
+      <span class="token key atrule">name</span><span class="token punctuation">:</span> value<span class="token punctuation">-</span>cm
+  <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> env
+    <span class="token key atrule">configMap</span><span class="token punctuation">:</span>
+      <span class="token key atrule">name</span><span class="token punctuation">:</span> env<span class="token punctuation">-</span>cm
+<span class="token key atrule">status</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>According to documentation of <code>Kubernetes 1.24</code>:</p>
+<blockquote>
+<p>The <code>volumeMounts.subPath</code>property specifies a sub-path inside the referenced volume instead of its root.</p>
+</blockquote>
+<p>So, consider each volume is a folder, then for <code>file</code> volume, it contains <code>config.txt</code> file and <code>text.txt</code> file. Then we can use relative path “config.txt” to point to <code>config.txt</code> file of <code>file volume</code> in <code>spec.containers.volumeMounts.subPath</code> property.</p>
+<p>If we apply this yaml file again and log into the new pod:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">ls</span>
+<span class="token punctuation">..</span>. <span class="token function">env</span> folder value <span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>Other folders are still here but just <code>file</code> folder is gone. Then we can check <code>/etc/nginx/conf.d</code> folder.</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">ls</span> /etc/nginx/conf.d
+config.txt  default.conf
+$ <span class="token function">cat</span> /etc/nginx/conf.d/config.txt
+<span class="token assign-left variable">Test</span><span class="token operator">=</span>test<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>default.conf</code> file is still here and only <code>config.txt</code> file which is specified in <code>subPath</code> is create in this folder.</p>
+<h3 id="Update-ConfigMap"><a href="#Update-ConfigMap" class="headerlink" title="Update ConfigMap"></a>Update ConfigMap</h3><p>Now, let’s see what will happen if we try to modify a ConfigMap. We edit two ConfigMaps: <code>file-cm</code> and <code>value-cm</code>:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment">#file-cm</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">data</span><span class="token punctuation">:</span>
+  <span class="token key atrule">config.txt</span><span class="token punctuation">:</span> <span class="token punctuation">|</span><span class="token scalar string">
+    Test=file-modified</span>
+  <span class="token key atrule">test.txt</span><span class="token punctuation">:</span> <span class="token punctuation">|</span><span class="token scalar string">
+    DONT=KNOW</span>
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ConfigMap
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">creationTimestamp</span><span class="token punctuation">:</span> <span class="token string">"2022-05-02T16:03:36Z"</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> file<span class="token punctuation">-</span>cm
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> default
+  <span class="token key atrule">resourceVersion</span><span class="token punctuation">:</span> <span class="token string">"281558"</span>
+  <span class="token key atrule">uid</span><span class="token punctuation">:</span> 17766fc1<span class="token punctuation">-</span>cfd5<span class="token punctuation">-</span>4b95<span class="token punctuation">-</span>b00f<span class="token punctuation">-</span>296844f23407
+
+<span class="token comment">#value-cm</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">data</span><span class="token punctuation">:</span>
+  <span class="token key atrule">Test</span><span class="token punctuation">:</span> value<span class="token punctuation">-</span>modified
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ConfigMap
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">creationTimestamp</span><span class="token punctuation">:</span> <span class="token string">"2022-05-03T15:26:07Z"</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> value<span class="token punctuation">-</span>cm
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> default
+  <span class="token key atrule">resourceVersion</span><span class="token punctuation">:</span> <span class="token string">"317489"</span>
+  <span class="token key atrule">uid</span><span class="token punctuation">:</span> f5431bb3<span class="token punctuation">-</span>6276<span class="token punctuation">-</span>48e8<span class="token punctuation">-</span>85e0<span class="token punctuation">-</span>33b0ef1a7243<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Then we can log into file-pod2, which we created in previous section, and check what happened after we modified the <code>ConfigMap</code>:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ kubectl <span class="token builtin class-name">exec</span> -it pod/file-pod2 -- <span class="token function">bash</span>
+<span class="token comment"># Content has been updated</span>
+$ <span class="token function">cat</span> value/Test
+value-modified
+
+<span class="token comment"># Content remains the same</span>
+$ <span class="token function">cat</span> /etc/nginx/conf.d/config.txt
+<span class="token assign-left variable">Test</span><span class="token operator">=</span>test<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>According to the result, after a <code>ConfigMap</code> is changed, the container who mounted this <code>ConfigMap</code> as volume will be updated as well. But there are several exceptions. </p>
+<p>One of these exceptions is that if the container uses the <code>ConfigMap</code> as <code>SubPath</code> volume, then it won’t receive the update.</p>
+<p>💡<code>ConfigMap</code> can be set immutable, <code>immutable ConfigMap</code> will not be watched constantly, which can reduce load on kube-<code>apiserver</code>.</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ConfigMap
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token punctuation">...</span>
+<span class="token key atrule">data</span><span class="token punctuation">:</span>
+  <span class="token punctuation">...</span>
+<span class="token key atrule">immutable</span><span class="token punctuation">:</span> <span class="token boolean important">true</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Use-ConfigMap-as-environment-variables-in-pod"><a href="#Use-ConfigMap-as-environment-variables-in-pod" class="headerlink" title="Use ConfigMap as environment variables in pod"></a>Use ConfigMap as environment variables in pod</h2><h3 id="Using-specific-values-in-ConfigMap-as-environment-variables"><a href="#Using-specific-values-in-ConfigMap-as-environment-variables" class="headerlink" title="Using specific values in ConfigMap as environment variables"></a>Using specific values in ConfigMap as environment variables</h3><p>In order to use specific values in ConfigMap as <code>environment variables</code> in container, we used <code>spec.containers.env.valueFrom.configMapKeyRef</code>:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment"># env-pod.yaml</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Pod
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">creationTimestamp</span><span class="token punctuation">:</span> <span class="token null important">null</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> env<span class="token punctuation">-</span>pod
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">image</span><span class="token punctuation">:</span> nginx
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> pod
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">containerPort</span><span class="token punctuation">:</span> <span class="token number">80</span>
+    <span class="token key atrule">resources</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+    <span class="token key atrule">env</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> FOLDER_KEY
+      <span class="token key atrule">valueFrom</span><span class="token punctuation">:</span>
+        <span class="token key atrule">configMapKeyRef</span><span class="token punctuation">:</span>
+          <span class="token key atrule">name</span><span class="token punctuation">:</span> folder<span class="token punctuation">-</span>cm
+          <span class="token key atrule">key</span><span class="token punctuation">:</span> test.txt
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> ENV_KEY
+      <span class="token key atrule">valueFrom</span><span class="token punctuation">:</span>
+        <span class="token key atrule">configMapKeyRef</span><span class="token punctuation">:</span>
+          <span class="token key atrule">name</span><span class="token punctuation">:</span> env<span class="token punctuation">-</span>cm
+          <span class="token key atrule">key</span><span class="token punctuation">:</span> DB_URL
+  <span class="token key atrule">dnsPolicy</span><span class="token punctuation">:</span> ClusterFirst
+  <span class="token key atrule">restartPolicy</span><span class="token punctuation">:</span> Always
+<span class="token key atrule">status</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Then create a new pod with this yaml file and checke the environment variables of it’s container:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ kubectl <span class="token builtin class-name">exec</span> pod/env-pod -- <span class="token function">env</span>
+<span class="token punctuation">..</span>.
+<span class="token assign-left variable">FOLDER_KEY</span><span class="token operator">=</span>DONT<span class="token operator">=</span>KNOW
+
+<span class="token assign-left variable">ENV_KEY</span><span class="token operator">=</span>localhost:3306
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The name of the variables are what we specified with <code>spec.containers.env.name</code>. Then it will search in the target <code>ConfigMap</code> which we specified with <code>spec.env.valueFrom.configMapKeyRef.name</code> in order to find the target key-value pair whose key equals to what we specified in <code>spec.env.valueFrom.configMapKeyRef.key</code>. The value of this environment variable will be the value of target key-value pair.</p>
+<h3 id="Using-all-values-in-ConfigMap-as-environment-variables"><a href="#Using-all-values-in-ConfigMap-as-environment-variables" class="headerlink" title="Using all values in ConfigMap as environment variables"></a>Using all values in ConfigMap as <strong><strong>environment variables</strong></strong></h3><p>Here we will use <code>spec.containers.envFrom.configMapRef</code> to inject all the key-value pairs of a <code>ConfigMap</code> to a container as environment variables:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment"># all-env-pod.yaml</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Pod
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">creationTimestamp</span><span class="token punctuation">:</span> <span class="token null important">null</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> all<span class="token punctuation">-</span>env<span class="token punctuation">-</span>pod
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> <span class="token key atrule">image</span><span class="token punctuation">:</span> nginx
+    <span class="token key atrule">name</span><span class="token punctuation">:</span> pod
+    <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">containerPort</span><span class="token punctuation">:</span> <span class="token number">80</span>
+    <span class="token key atrule">resources</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+    <span class="token key atrule">envFrom</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">configMapRef</span><span class="token punctuation">:</span>
+        <span class="token key atrule">name</span><span class="token punctuation">:</span> env<span class="token punctuation">-</span>cm
+  <span class="token key atrule">dnsPolicy</span><span class="token punctuation">:</span> ClusterFirst
+  <span class="token key atrule">restartPolicy</span><span class="token punctuation">:</span> Always
+<span class="token key atrule">status</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>After this yaml file is applied, the environment variables of the new containers are:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml">$ kubectl exec pod/all<span class="token punctuation">-</span>env<span class="token punctuation">-</span>pod <span class="token punctuation">-</span><span class="token punctuation">-</span> env
+<span class="token punctuation">...</span>
+DB_URL=localhost<span class="token punctuation">:</span><span class="token number">3306</span>
+DB_USERNAME=postgres
+<span class="token punctuation">...</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>All the key-value pairs of <code>ConfigMap</code> are used as environment variable and their keys are the variable names while their values are the variable values.</p>
+<h3 id="Update-ConfigMap-1"><a href="#Update-ConfigMap-1" class="headerlink" title="Update ConfigMap"></a>Update ConfigMap</h3><p>Same as what we mentioned in previous section - <code>Use ConfigMap as files in pod</code>, we are going to modified the ConfigMap and see what will happen to corresponding containers:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment">## env-cm</span>
+<span class="token key atrule">data</span><span class="token punctuation">:</span>
+  <span class="token key atrule">DB_URL</span><span class="token punctuation">:</span> localhost<span class="token punctuation">:</span>3306_modified
+  <span class="token key atrule">DB_USERNAME</span><span class="token punctuation">:</span> postgres
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ConfigMap
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">creationTimestamp</span><span class="token punctuation">:</span> <span class="token string">"2022-05-03T15:30:49Z"</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> env<span class="token punctuation">-</span>cm
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> default
+  <span class="token key atrule">resourceVersion</span><span class="token punctuation">:</span> <span class="token string">"65184"</span>
+  <span class="token key atrule">uid</span><span class="token punctuation">:</span> 60dba811<span class="token punctuation">-</span>8fa9<span class="token punctuation">-</span>4bb1<span class="token punctuation">-</span>9e7b<span class="token punctuation">-</span>9d45a02009eb<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>We changed the value of <code>DB_URL</code>, then environment variables of the previous two containers are:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ kubectl <span class="token builtin class-name">exec</span> pod/env-pod -- <span class="token function">env</span>
+<span class="token punctuation">..</span>.
+<span class="token assign-left variable">FOLDER_KEY</span><span class="token operator">=</span>DONT<span class="token operator">=</span>KNOW
+
+<span class="token assign-left variable">ENV_KEY</span><span class="token operator">=</span>localhost:3306
+<span class="token punctuation">..</span>.
+
+$ kubectl <span class="token builtin class-name">exec</span> pod/all-env-pod -- <span class="token function">env</span>
+<span class="token punctuation">..</span>.
+<span class="token assign-left variable">DB_URL</span><span class="token operator">=</span>localhost:3306
+<span class="token assign-left variable">DB_USERNAME</span><span class="token operator">=</span>postgres
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The environment variables who are created from ConfigMap remain the same. This is the other situation that we talked about before in which corresponding containers will not receive the update of the ConfigMap.</p>
+
+  </div>
+  <div>
+    
+      <div 
+        class="post-note note-warning copyright" 
+        style="margin-top: 42px">
+        <p>
+          <span style="font-weight: bold;">作者：</span><a 
+            target="_blank" 
+            rel="nofollow noopener noreferrer" 
+            href="/en/about">
+            lz-nsc
+          </a>
+        </p>
+        <p>
+          <span style="font-weight: bold;">文章链接：</span><a 
+            target="_blank" 
+            rel="nofollow noopener noreferrer" 
+            href="http://lzreload.com/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/">
+            http://lzreload.com/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/
+          </a>
+        </p>
+        <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+      </div>
+    
+  </div>
+</article>
+<div class="nav">
+  
+  
+    <div class="nav-item-next">
+      <a 
+        href="/en/2022/04/15/Golang-Heap/" 
+        class="nav-link">
+        <div>
+          <div class="nav-label">Next</div>
+          
+            <div class="nav-title">Go: About package heap </div>
+          
+        </div>
+        <i class="iconfont icon-right nav-next-icon"></i>
+      </a>
+    </div>
+  
+</div>
+
+  <div 
+    class="card card-content comment-card" 
+    style="margin-top: 16px;">
+    <div class="comment-card-title">评论</div>
+    
+  <div id="vcomments"></div>
+  
+  <script>
+    loadScript("//unpkg.com/valine/dist/Valine.min.js");
+    var oldLoadVa = window.onload;
+    window.onload = function () {
+      oldLoadVa && oldLoadVa();
+      new Valine({
+        el: '#vcomments',
+        appId: '6AA1gXvoIRhGdQhCpYejA0Us-gzGzoHsz',
+        appKey: 'OyxvagUt7NEgTT0JB4WwWIzx',
+        placeholder: 'Comment',
+        path: window.location.pathname,
+        avatar: 'mp',
+        meta: ["nick","mail","link"],
+        pageSize: '10',
+        lang: '',
+        visitor: 'false',
+        highlight: true,
+        recordIP: true,
+        
+        
+        
+        enableQQ: 'false',
+        requiredFields: [],
+      });
+    };
+  </script>
+
+  </div>
+
+<div 
+  class="card card-content toc-card" 
+  id="mobiletoc">
+  <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>TOC
+</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Kubernete-Configuration-ConfigMap"><span class="toc-text">Kubernete Configuration - ConfigMap</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Creating-ConfigMap"><span class="toc-text">Creating ConfigMap</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-folder"><span class="toc-text">Create from folder</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-file"><span class="toc-text">Create from file</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-key-value-pairs"><span class="toc-text">Create from key-value pairs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-env-file"><span class="toc-text">Create from env file</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Using-configMap"><span class="toc-text">Using configMap</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Use-ConfigMap-as-files-in-pod"><span class="toc-text">Use ConfigMap as files in pod</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Mount-configMap"><span class="toc-text">Mount configMap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mount-ConfigMap-with-SubPath"><span class="toc-text">Mount ConfigMap with SubPath</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Update-ConfigMap"><span class="toc-text">Update ConfigMap</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Use-ConfigMap-as-environment-variables-in-pod"><span class="toc-text">Use ConfigMap as environment variables in pod</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-specific-values-in-ConfigMap-as-environment-variables"><span class="toc-text">Using specific values in ConfigMap as environment variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-all-values-in-ConfigMap-as-environment-variables"><span class="toc-text">Using all values in ConfigMap as environment variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Update-ConfigMap-1"><span class="toc-text">Update ConfigMap</span></a></li></ol></li></ol></li></ol>
+</div></main>
+            <aside class="left-column">
+              
+              <div class="card card-author">
+                
+  <img 
+    src="/img/author.png" 
+    class="author-img"
+    width="88"
+    height="88"
+    alt="author avatar">
+
+<p class="author-name">lz-nsc</p>
+<p class="author-description"></p>
+<div class="author-message">
+  <a 
+    class="author-posts-count" 
+    href="/en/archives">
+    <span>2</span>
+    <span>Posts</span>
+  </a>
+  <a 
+    class="author-categories-count" 
+    href="/en/categories">
+    <span>0</span>
+    <span>Categories</span>
+  </a>
+  <a 
+    class="author-tags-count" 
+    href="/en/tags">
+    <span>2</span>
+    <span>Tags</span>
+  </a>
+</div>
+
+              </div>
+               <div class="sticky-tablet">
+  
+  
+    <article class="display-when-two-columns spacer">
+      <div class="card card-content toc-card">
+        <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>TOC
+</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Kubernete-Configuration-ConfigMap"><span class="toc-text">Kubernete Configuration - ConfigMap</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Creating-ConfigMap"><span class="toc-text">Creating ConfigMap</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-folder"><span class="toc-text">Create from folder</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-file"><span class="toc-text">Create from file</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-key-value-pairs"><span class="toc-text">Create from key-value pairs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-env-file"><span class="toc-text">Create from env file</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Using-configMap"><span class="toc-text">Using configMap</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Use-ConfigMap-as-files-in-pod"><span class="toc-text">Use ConfigMap as files in pod</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Mount-configMap"><span class="toc-text">Mount configMap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mount-ConfigMap-with-SubPath"><span class="toc-text">Mount ConfigMap with SubPath</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Update-ConfigMap"><span class="toc-text">Update ConfigMap</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Use-ConfigMap-as-environment-variables-in-pod"><span class="toc-text">Use ConfigMap as environment variables in pod</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-specific-values-in-ConfigMap-as-environment-variables"><span class="toc-text">Using specific values in ConfigMap as environment variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-all-values-in-ConfigMap-as-environment-variables"><span class="toc-text">Using all values in ConfigMap as environment variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Update-ConfigMap-1"><span class="toc-text">Update ConfigMap</span></a></li></ol></li></ol></li></ol>
+      </div>
+    </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header">
+    <i 
+      class="iconfont icon-fenlei" 
+      style="padding-right: 2px;">
+    </i>Categories
+  </div>
+  <div class="categories-list">
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header">
+    <i 
+      class="iconfont icon-biaoqian" 
+      style="padding-right: 2px;">
+    </i>hot tags
+  </div>
+  <div class="tags-list">
+    
+      <a 
+        href="/en/tags/Golang/" 
+        title="Golang">
+        <div class="tags-list-item">Golang</div>
+      </a>
+    
+      <a 
+        href="/en/tags/Kubernetes/" 
+        title="Kubernetes">
+        <div class="tags-list-item">Kubernetes</div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+            </aside>
+            <aside class="right-column">
+              <div class="sticky-widescreen">
+  
+  
+    <article class="card card-content toc-card">
+      <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>TOC
+</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Kubernete-Configuration-ConfigMap"><span class="toc-text">Kubernete Configuration - ConfigMap</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Creating-ConfigMap"><span class="toc-text">Creating ConfigMap</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-folder"><span class="toc-text">Create from folder</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-file"><span class="toc-text">Create from file</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-key-value-pairs"><span class="toc-text">Create from key-value pairs</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-from-env-file"><span class="toc-text">Create from env file</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Using-configMap"><span class="toc-text">Using configMap</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Use-ConfigMap-as-files-in-pod"><span class="toc-text">Use ConfigMap as files in pod</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Mount-configMap"><span class="toc-text">Mount configMap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Mount-ConfigMap-with-SubPath"><span class="toc-text">Mount ConfigMap with SubPath</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Update-ConfigMap"><span class="toc-text">Update ConfigMap</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Use-ConfigMap-as-environment-variables-in-pod"><span class="toc-text">Use ConfigMap as environment variables in pod</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-specific-values-in-ConfigMap-as-environment-variables"><span class="toc-text">Using specific values in ConfigMap as environment variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Using-all-values-in-ConfigMap-as-environment-variables"><span class="toc-text">Using all values in ConfigMap as environment variables</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Update-ConfigMap-1"><span class="toc-text">Update ConfigMap</span></a></li></ol></li></ol></li></ol>
+    </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header">
+    <i 
+      class="iconfont icon-wenzhang_huaban" 
+      style="padding-right: 2px;">
+    </i>Recent Posts
+  </div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-05-08</div>
+        <a href="/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/"><div class="recent-posts-item-content">About Kubernetes configuration: ConfigMap</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-04-15</div>
+        <a href="/en/2022/04/15/Golang-Heap/"><div class="recent-posts-item-content">Go: About package heap</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+     
+    <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>
+          Copyright ©
+          
+            2022
+          
+          
+        </span>
+        &nbsp;
+        <a 
+          href="/en/" 
+          class="footer-link">
+          Lynn's blog
+        </a>
+      </div>
+    </div>
+
+    
+      <div class="footer-dsc">
+        
+          Powered by
+          <a 
+            href="https://hexo.io/" 
+            class="footer-link" 
+            target="_blank" 
+            rel="nofollow noopener noreferrer">
+            &nbsp;Hexo
+          </a>
+        
+        
+        
+      </div>
+    
+    
+    
+    
+      <div class="footer-dsc">
+        
+          本站总访问量<span id="busuanzi_value_site_pv"></span>次
+        
+        
+          <span>&nbsp;|&nbsp;</span>
+        
+        
+          本站总访客数<span id="busuanzi_value_site_uv"></span>次
+        
+      </div>
+      
+    
+</footer>
+ 
+    
+  <a 
+    role="button" 
+    id="scrollbutton" 
+    class="basebutton" 
+    aria-label="回到顶部">
+    <i class="iconfont icon-arrowleft button-icon"></i>
+  </a>
+
+<a 
+  role="button" 
+  id="menubutton"
+  aria-label="menu button"
+  class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="popbutton" 
+  class="basebutton" 
+  aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="darkbutton" 
+  class="basebutton darkwidget" 
+  aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="searchbutton" 
+  class="basebutton searchwidget" 
+  aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a> 
+     
+     
+     
+      <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img')
+    var i
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a')
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'))
+      wrapper.setAttribute('aria-label', 'illustration')
+      wrapper.style.cssText =
+        'width: 100%; display: flex; justify-content: center;'
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt
+      wrapper.dataset.nolink = true
+      img[i].before(wrapper)
+      wrapper.append(img[i])
+      var divWrap = document.createElement('div')
+      divWrap.classList.add('gallery')
+      wrapper.before(divWrap)
+      divWrap.append(wrapper)
+    }
+    baguetteBox.run('.gallery')
+  }
+</script>
+<script>
+  loadScript(
+    "/en/js/lib/lightbox/baguetteBox.min.js",
+    addImgLayout
+  )
+</script>
+ 
+     
+     
+    <script src="/en/js/main.js"></script> 
+    
+      <script> 
+        loadScript('/en/js/lib/busuanzi.min.js') 
+      </script>
+     
+    
+      <script>
+        var addLazyload = function () {
+          var observer = lozad('.lozad', {
+            load: function (el) {
+              el.srcset = el.getAttribute('data-src')
+            },
+            loaded: function (el) {
+              el.classList.add('loaded')
+            },
+          })
+          observer.observe()
+        }
+      </script>
+      <script>
+        loadScript('/en/js/lib/lozad.min.js', addLazyload)
+      </script>
+     
+    
+    
+  </body>
+</html>

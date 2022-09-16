@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="UTF-8">
+  <meta 
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta 
+    http-equiv="X-UA-Compatible" 
+    content="ie=edge">
+  <meta 
+    name="theme-color" 
+    content="#fff" 
+    id="theme-color">
+  <meta 
+    name="description" 
+    content="Lynn&#39;s Blog">
+  <link 
+    rel="icon" 
+    href="/en/img/logo.png">
+  <title>About Docker network - Part 1</title>
+  
+    
+      <meta 
+        property="og:title" 
+        content="About Docker network - Part 1">
+    
+    
+      <meta 
+        property="og:url" 
+        content="http://lzreload.com/en/2022/09/16/Docker-NetWork-1/index.html">
+    
+    
+      <meta 
+        property="og:img" 
+        content="/img/author.png">
+    
+    
+    
+      <meta 
+        property="og:type" 
+        content="article">
+      <meta 
+        property="og:article:published_time" 
+        content="2022-09-16">
+      <meta 
+        property="og:article:modified_time" 
+        content="2022-09-16">
+      <meta 
+        property="og:article:author" 
+        content="lz-nsc">
+      
+        
+          <meta 
+            property="og:article:tag" 
+            content="Docker">
+        
+          <meta 
+            property="og:article:tag" 
+            content="Network">
+        
+      
+    
+  
+  <script>
+    function loadScript(url, cb) {
+      var script = document.createElement('script');
+      script.src = url;
+      if (cb) script.onload = cb;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+    function loadCSS(href, data, attr) {
+      var sheet = document.createElement('link');
+      sheet.ref = 'stylesheet';
+      sheet.href = href;
+      sheet.dataset[data] = attr;
+      document.head.appendChild(sheet);
+    }
+    function changeCSS(cssFile, data, attr) {
+      var oldlink = document.querySelector(data);
+      var newlink = document.createElement("link");
+      newlink.setAttribute("rel", "stylesheet");
+      newlink.setAttribute("href", cssFile);
+      newlink.dataset.prism = attr;
+      document.head.replaceChild(newlink, oldlink);
+    }
+  </script>
+  
+    
+      
+      
+      
+      
+        
+        
+        
+        <script>
+          function prismThemeChange() {
+            if(document.getElementById('theme-color').dataset.mode === 'dark') {
+              if(document.querySelector('[data-prism]')) {
+                changeCSS('/en/js/lib/prism/prism-tomorrow.min.css', '[data-prism]', 'prism-tomorrow');
+              } else {
+                loadCSS('/en/js/lib/prism/prism-tomorrow.min.css', 'prism', 'prism-tomorrow');
+              }
+            } else {
+              if(document.querySelector('[data-prism]')) {
+                changeCSS('/en/js/lib/prism/prism.min.css', '[data-prism]', 'prism');
+              } else {
+                loadCSS('/en/js/lib/prism/prism.min.css', 'prism', 'prism');
+              }
+            }
+          }
+          prismThemeChange()
+        </script>
+      
+      
+        
+        <link rel="stylesheet" href="/en/js/lib/prism/prism-line-numbers.min.css">
+      
+    
+  
+  <script>
+    // control reverse button
+    var reverseDarkList = {
+      dark: 'light',
+      light: 'dark'
+    };
+    var themeColor = {
+      dark: '#1c1c1e',
+      light: '#fff'
+    }
+    // get the data of css prefers-color-scheme
+    var getCssMediaQuery = function() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+    // reverse current darkmode setting function
+    var reverseDarkModeSetting = function() {
+      var setting = localStorage.getItem('user-color-scheme');
+      if(reverseDarkList[setting]) {
+        setting = reverseDarkList[setting];
+      } else if(setting === null) {
+        setting = reverseDarkList[getCssMediaQuery()];
+      } else {
+        return;
+      }
+      localStorage.setItem('user-color-scheme', setting);
+      return setting;
+    };
+    // apply current darkmode setting
+  </script>
+  
+    <script>
+      var setDarkmode = function(mode) {
+      var setting = mode || localStorage.getItem('user-color-scheme');
+      if(setting === getCssMediaQuery()) {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[setting];
+        document.getElementById('theme-color').dataset.mode = setting;
+        prismThemeChange();
+      } else if(reverseDarkList[setting]) {
+        document.documentElement.setAttribute('data-user-color-scheme', setting);
+        document.getElementById('theme-color').content = themeColor[setting];
+        document.getElementById('theme-color').dataset.mode = setting;
+        prismThemeChange();
+      } else {
+        document.documentElement.removeAttribute('data-user-color-scheme');
+        localStorage.removeItem('user-color-scheme');
+        document.getElementById('theme-color').content = themeColor[getCssMediaQuery()];
+        document.getElementById('theme-color').dataset.mode = getCssMediaQuery();
+        prismThemeChange();
+      }
+    };
+    setDarkmode();
+    </script>
+  
+  
+  <link rel="preload" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css" as="style" >
+  <link rel="preload" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css" as="style" >
+  
+  
+    <link rel="preload" href="/en/js/lib/lightbox/baguetteBox.min.js" as="script">
+    <link rel="preload" href="/en/js/lib/lightbox/baguetteBox.min.css" as="style" >
+  
+  
+    <link rel="preload" href="/en/js/lib/lozad.min.js" as="script">
+  
+  
+  
+  
+  
+    
+    <link rel="prefetch" href="//unpkg.com/valine/dist/Valine.min.js" as="script">
+  
+  
+  
+  <link rel="stylesheet" href="/en/css/main.css">
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1946621_i1kgafibvw.css">
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1952792_89b4ac4k4up.css">
+  
+    <link rel="stylesheet" href="/en/js/lib/lightbox/baguetteBox.min.css">
+  
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/en/atom.xml" title="Lynn's Blog" type="application/atom+xml">
+</head>
+
+  <body>
+    <div class="wrapper">
+       
+      <nav class="navbar">
+  <div class="navbar-logo">
+    <span class="navbar-logo-main">
+      
+        <img 
+          class="navbar-logo-img"
+          width="32"
+          height="32"
+          src="/en/img/logo.png" 
+          alt="blog logo">
+      
+      <span class="navbar-logo-dsc">Lynn's blog</span>
+    </span>
+  </div>
+  <div class="navbar-menu">
+    
+      <a 
+        href="/en/" 
+        class="navbar-menu-item">
+        
+          Home
+        
+      </a>
+    
+      <a 
+        href="/en/archives" 
+        class="navbar-menu-item">
+        
+          Archive
+        
+      </a>
+    
+      <a 
+        href="/en/tags" 
+        class="navbar-menu-item">
+        
+          Tags
+        
+      </a>
+    
+      <a 
+        href="/en/categories" 
+        class="navbar-menu-item">
+        
+          Categories
+        
+      </a>
+    
+      <a 
+        href="/en/about" 
+        class="navbar-menu-item">
+        
+          About
+        
+      </a>
+    
+      <a 
+        href="/en/links" 
+        class="navbar-menu-item">
+        
+          Friends
+        
+      </a>
+    
+      <a 
+        href="http://lzreload.com/" 
+        class="navbar-menu-item">
+        
+          中文
+        
+      </a>
+    
+    <a 
+      class="navbar-menu-item darknavbar" 
+      id="dark">
+      <i class="iconfont icon-weather"></i>
+    </a>
+    <a 
+      class="navbar-menu-item searchnavbar" 
+      id="search">
+      <i 
+        class="iconfont icon-search" 
+        style="font-size: 1.2rem; font-weight: 400;">
+      </i>
+    </a>
+  </div>
+</nav> 
+      
+      <div 
+        id="local-search" 
+        style="display: none">
+        <input
+          class="navbar-menu-item"
+          id="search-input"
+          placeholder="请输入搜索内容..." />
+        <div id="search-content"></div>
+      </div>
+      
+      <div class="section-wrap">
+        <div class="container">
+          <div class="columns">
+            <main class="main-column">
+<article class="card card-content">
+  <header>
+    <h1 class="post-title">
+      About Docker network - Part 1
+    </h1>
+  </header>
+  <div class="post-meta post-show-meta">
+    <time datetime="2022-09-16T10:40:25.000Z">
+      <i 
+        class="iconfont icon-calendar" 
+        style="margin-right: 2px;">
+      </i>
+      <span>2022-09-16</span>
+    </time>
+    
+    
+      <span class="dot"></span>
+      <span>4.3k words</span>
+    
+  </div>
+  
+    <div 
+      class="post-meta post-show-meta" 
+      style="margin-top: -10px;">
+      <div style="display: flex; align-items: center;">
+        <i 
+          class="iconfont icon-biaoqian" 
+          style="margin-right: 2px; font-size: 1.15rem;">
+        </i>
+        
+          
+          <a 
+            href="/en/tags/Docker/" 
+            class="post-meta-link">
+            Docker
+          </a>
+        
+          
+            <span class="dot"></span>
+          
+          <a 
+            href="/en/tags/Network/" 
+            class="post-meta-link">
+            Network
+          </a>
+        
+      </div>
+    </div>
+  
+  </header>
+  <div 
+    id="section" 
+    class="post-content">
+    <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p>According to docker’s official document, docker’s networking subsystem(libnetwork) is portable, it’s using driver to provide networking functionality. Currently, these drivers exist by default:</p>
+<ul>
+<li>bridge</li>
+<li>host</li>
+<li>overlay</li>
+<li>ipvlan</li>
+<li>macvlan</li>
+</ul>
+<p>If we use <code>docker network ls</code> command to list networks offered by docker by default we can see:</p>
+<pre class="line-numbers language-docker" data-language="docker"><code class="language-docker">$ docker network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+2fd34f93b369   bridge    bridge    local
+8e489d56f4d5   host      host      local
+2f7960394c0f   none      null      local<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>None</code>, <code>host</code>, and <code>bridge</code> network are created by default once docker starts. <code>host</code> and <code>bridge</code> network is using <code>host</code> and <code>bridge</code> driver respectively mentioned above while <code>none</code> network is created without network driver. These three networks will be discussed in this article mainly about how containers will act when they are connected to different networks.</p>
+<h1 id="None"><a href="#None" class="headerlink" title="None"></a>None</h1><p>Containers that are connected to <code>none</code> ****network will not have an external network interface:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Create a container with `none` network mode </span>
+$ docker run --rm -dit --network none --name no-net-alpine alpine:latest ash
+
+<span class="token comment"># Check container's network</span>
+$ docker <span class="token builtin class-name">exec</span> no-net-alpine <span class="token function">ip</span> <span class="token function">link</span> show
+<span class="token number">1</span>: lo: <span class="token operator">&lt;</span>LOOPBACK,UP,LOWER_UP<span class="token operator">></span> mtu <span class="token number">65536</span> qdisc noqueue state UNKNOWN qlen <span class="token number">1000</span>
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Container with this mode of networking will only have a loopback interface, which means that it’s unable to send messages to other containers or external networks.</p>
+<h1 id="Host"><a href="#Host" class="headerlink" title="Host"></a>Host</h1><p>Before we create a new container, we can inspect the network interface of the host first:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Local host</span>
+$ <span class="token function">ifconfig</span>
+docker0: <span class="token assign-left variable">flags</span><span class="token operator">=</span><span class="token number">409</span><span class="token operator"><span class="token file-descriptor important">9</span>&lt;</span>UP,BROADCAST,MULTICAST<span class="token operator">></span>  mtu <span class="token number">1500</span>
+        inet <span class="token number">172.17</span>.0.1  netmask <span class="token number">255.255</span>.0.0  broadcast <span class="token number">172.17</span>.255.255
+<span class="token punctuation">..</span>.
+
+ens192: <span class="token assign-left variable">flags</span><span class="token operator">=</span><span class="token number">416</span><span class="token operator"><span class="token file-descriptor important">3</span>&lt;</span>UP,BROADCAST,RUNNING,MULTICAST<span class="token operator">></span>  mtu <span class="token number">1500</span>
+<span class="token punctuation">..</span>.
+
+lo: <span class="token assign-left variable">flags</span><span class="token operator">=</span><span class="token number">7</span><span class="token operator"><span class="token file-descriptor important">3</span>&lt;</span>UP,LOOPBACK,RUNNING<span class="token operator">></span>  mtu <span class="token number">65536</span>
+        inet <span class="token number">127.0</span>.0.1  netmask <span class="token number">255.0</span>.0.0
+<span class="token punctuation">..</span>.
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Then, let’s create a new container and connect it to the <code>host</code> network:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Create a new container with host network mode</span>
+$ docker run --rm -dit --network <span class="token function">host</span> --name host-alpine alpine:latest ash
+
+<span class="token comment"># Access to new container</span>
+$ docker <span class="token builtin class-name">exec</span> -it host-alpine /bin/sh
+
+<span class="token comment"># Container host-alpine</span>
+$ <span class="token function">ifconfig</span>
+docker0   Link encap:Ethernet  HWaddr 02:42:D3:3C:90:82  
+          inet addr:172.17.0.1  Bcast:172.17.255.255  Mask:255.255.0.0
+<span class="token punctuation">..</span>.
+
+ens192    Link encap:Ethernet  HWaddr 00:50:56:BA:06:B7  
+<span class="token punctuation">..</span>.
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>According to the container shown above, we can observe that this new container has exact same network interfaces as the host which means that, it shares the host’s networking namespaces.</p>
+<p>We can just consider it a normal app running on our computer. For example, we can also create an Nginx container with <code>host</code> network:</p>
+<pre class="line-numbers language-docker" data-language="docker"><code class="language-docker"><span class="token comment"># Host (No need to add --p to expose port 80 when using host network)</span>
+$ docker run --rm -d --network host --name my_nginx nginx<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>Then we can try to sent request to Nginx from Container host-alpine:</p>
+<pre class="line-numbers language-docker" data-language="docker"><code class="language-docker"><span class="token comment"># Access previous host container(host-alpine)</span>
+$ docker exec -it host-alpine /bin/sh
+<span class="token comment"># Container host-alpine</span>
+$ curl localhost:80
+&lt;!DOCTYPE html>
+...<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Since container <code>my_nginx</code> and <code>host-alpine</code> are all connecting to <code>host</code> network, they all share the host’s network namespace, so that <code>host-alpine</code> can directly use <code>localhost:80</code> to send requests to <code>my_nginx</code>.</p>
+<h1 id="Bridge"><a href="#Bridge" class="headerlink" title="Bridge"></a>Bridge</h1><h2 id="About-Bridge-mode"><a href="#About-Bridge-mode" class="headerlink" title="About Bridge mode"></a>About Bridge mode</h2><p><code>Bridge</code> is the default network driver of docker. </p>
+<p>When we talk about <code>bridge network</code>, we are talking about a Link Layer device(a hardware device or a software device) that forwards traffic between network segments.</p>
+<p>In <code>Docker</code>, a software bridge is used for containers to connect to the same bridge network in order to communicate with each other.</p>
+<p>Before we start to create a container with <code>bridge</code> network type, we can check the initial state of our local environment first:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Inspect the ethernet bridge configuration</span>
+$ brctl show
+bridge name     bridge <span class="token function">id</span>               STP enabled     interfaces
+docker0         <span class="token number">8000</span>.02428ab4554d       no
+
+$ <span class="token function">ip</span> <span class="token function">link</span> show
+<span class="token punctuation">..</span>.
+<span class="token number">3</span>: docker0: <span class="token operator">&lt;</span>NO-CARRIER,BROADCAST,MULTICAST,UP<span class="token operator">></span> mtu <span class="token number">1500</span> qdisc noqueue state DOWN mode DEFAULT group default 
+    link/ether 02:42:8a:b4:55:4d brd ff:ff:ff:ff:ff:ff
+<span class="token punctuation">..</span>.
+
+<span class="token comment"># Show IP routing table</span>
+$ route -n
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+<span class="token number">0.0</span>.0.0         <span class="token number">10.103</span>.226.1    <span class="token number">0.0</span>.0.0         UG    <span class="token number">100</span>    <span class="token number">0</span>        <span class="token number">0</span> ens192
+<span class="token number">10.103</span>.226.0    <span class="token number">0.0</span>.0.0         <span class="token number">255.255</span>.255.0   U     <span class="token number">100</span>    <span class="token number">0</span>        <span class="token number">0</span> ens192
+<span class="token number">172.17</span>.0.0      <span class="token number">0.0</span>.0.0         <span class="token number">255.255</span>.0.0     U     <span class="token number">0</span>      <span class="token number">0</span>        <span class="token number">0</span> docker0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Create-container-with-bridge-mode-default"><a href="#Create-container-with-bridge-mode-default" class="headerlink" title="Create container with bridge mode(default):"></a>Create container with bridge mode(default):</h2><p>Then we can start to create a container:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Create a container with `bridge` network type</span>
+$ docker run --rm -dit --name bridge-alpine alpine ash
+
+<span class="token comment"># Check ips of container</span>
+$ docker <span class="token builtin class-name">exec</span> bridge-alpine <span class="token function">ip</span> addr
+<span class="token number">1</span>: lo: <span class="token operator">&lt;</span>LOOPBACK,UP,LOWER_UP<span class="token operator">></span> mtu <span class="token number">65536</span> qdisc noqueue state UNKNOWN qlen <span class="token number">1000</span>
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet <span class="token number">127.0</span>.0.1/8 scope <span class="token function">host</span> lo
+       valid_lft forever preferred_lft forever
+<span class="token number">7</span>: eth0@if8: <span class="token operator">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN<span class="token operator">></span> mtu <span class="token number">1500</span> qdisc noqueue state UP 
+    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff
+    inet <span class="token number">172.17</span>.0.2/16 brd <span class="token number">172.17</span>.255.255 scope global eth0
+       valid_lft forever preferred_lft forever<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Compared to the previous container with <code>none</code> network mode, this new container has one more network interface <code>eth0</code> and got an ip <code>172.17.0.2</code>.</p>
+<p>Then we can check the network state of the current environment:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Inspect the ethernet bridge configuration</span>
+$ brctl show
+bridge name     bridge <span class="token function">id</span>               STP enabled     interfaces
+docker0         <span class="token number">8000</span>.0242a1f90aad       no              veth80ec58c
+
+$ <span class="token function">ip</span> <span class="token function">link</span> show
+<span class="token punctuation">..</span>.
+<span class="token number">3</span>: docker0: <span class="token operator">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP<span class="token operator">></span> mtu <span class="token number">1500</span> qdisc noqueue state UP mode DEFAULT group default 
+    link/ether 02:42:8a:b4:55:4d brd ff:ff:ff:ff:ff:ff
+<span class="token number">8</span>: veth80ec58c@if7: <span class="token operator">&lt;</span>BROADCAST,MULTICAST,UP,LOWER_UP<span class="token operator">></span> mtu <span class="token number">1500</span> qdisc noqueue master docker0 state UP mode DEFAULT group default 
+    link/ether 0e:e2:2d:20:d2:ad brd ff:ff:ff:ff:ff:ff link-netnsid <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Apparently, now that there’s a new interface <code>veth80ec58c</code> who is connecting to docker0. And also this new interface(<code>veth80ec58c</code>) and <code>interface 7</code> (shown in the container as interface <code>eth0</code>) are two connected endpoints of a <code>veth pair</code> that act as tunnels between network namespaces.</p>
+<p><img src="/img/docker_bridge.png" alt="docker_bridge.png" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="/img/docker_bridge.png" class="lozad post-image"></p>
+<h2 id="Communication-between-pods"><a href="#Communication-between-pods" class="headerlink" title="Communication between pods"></a>Communication between pods</h2><p> Now that we can create another two containers <code>bridge-alpine2</code> and <code>bridge-alpine3</code>:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Create a new container</span>
+$ docker run --rm -dit --name bridge-alpine2 alpine ash
+$ docker run --rm -dit --name bridge-alpine3 alpine ash<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>Then we can observe that there’re two new interfaces that are connecting to docker0:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ brctl show                    
+bridge name     bridge <span class="token function">id</span>       STP enabled       interfaces
+docker0         <span class="token number">8000</span>.0242a1f90aad       no       veth4a318ba
+                                                 veth80ec58c
+                                                 vethd234967<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p> We are going to ping container <code>bridge-alpine</code> from container <code>bridge-alpine2</code> using its IP (<code>172.17.0.2</code>) to observe the communication between pods.:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ docker <span class="token builtin class-name">exec</span> -it bridge-alpine2 /bin/sh
+<span class="token comment"># Inside container bridge-alpine2(172.17.0.3)</span>
+$ <span class="token function">ping</span> <span class="token number">172.17</span>.0.2
+PING <span class="token number">172.17</span>.0.2 <span class="token punctuation">(</span><span class="token number">172.17</span>.0.2<span class="token punctuation">)</span>: <span class="token number">56</span> data bytes
+<span class="token number">64</span> bytes from <span class="token number">172.17</span>.0.2: <span class="token assign-left variable">seq</span><span class="token operator">=</span><span class="token number">0</span> <span class="token assign-left variable">ttl</span><span class="token operator">=</span><span class="token number">64</span> <span class="token assign-left variable">time</span><span class="token operator">=</span><span class="token number">0.333</span> ms
+<span class="token number">64</span> bytes from <span class="token number">172.17</span>.0.2: <span class="token assign-left variable">seq</span><span class="token operator">=</span><span class="token number">1</span> <span class="token assign-left variable">ttl</span><span class="token operator">=</span><span class="token number">64</span> <span class="token assign-left variable">time</span><span class="token operator">=</span><span class="token number">0.151</span> ms
+
+<span class="token comment"># Host</span>
+<span class="token comment"># Capture package from docker0</span>
+$ tcpdump -i docker0 -v -nn -e -t
+tcpdump: listening on docker0, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size <span class="token number">262144</span> bytes
+02:42:ac:11:00:03 <span class="token operator">></span> **ff:ff:ff:ff:ff:ff**, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Request who-has <span class="token number">172.17</span>.0.2 tell <span class="token number">172.17</span>.0.3, length <span class="token number">28</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Reply <span class="token number">172.17</span>.0.2 is-at 02:42:ac:11:00:02, length <span class="token number">28</span>
+02:42:ac:11:00:03 <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">7910</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.3 <span class="token operator">></span> <span class="token number">172.17</span>.0.2: ICMP <span class="token builtin class-name">echo</span> request, <span class="token function">id</span> <span class="token number">16</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">59835</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>none<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2 <span class="token operator">></span> <span class="token number">172.17</span>.0.3: ICMP <span class="token builtin class-name">echo</span> reply, <span class="token function">id</span> <span class="token number">16</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+02:42:ac:11:00:03 <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">7986</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+
+<span class="token comment"># Container bridge-alpine2</span>
+$ tcpdump -i veth4a318ba -v -nn -e -t
+02:42:ac:11:00:03 <span class="token operator">></span> ff:ff:ff:ff:ff:ff, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Request who-has <span class="token number">172.17</span>.0.2 tell <span class="token number">172.17</span>.0.3, length <span class="token number">28</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Reply <span class="token number">172.17</span>.0.2 is-at 02:42:ac:11:00:02, length <span class="token number">28</span>
+02:42:ac:11:00:03 <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">56762</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.3 <span class="token operator">></span> <span class="token number">172.17</span>.0.2: ICMP <span class="token builtin class-name">echo</span> request, <span class="token function">id</span> <span class="token number">17</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">55430</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>none<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2 <span class="token operator">></span> <span class="token number">172.17</span>.0.3: ICMP <span class="token builtin class-name">echo</span> reply, <span class="token function">id</span> <span class="token number">17</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+
+<span class="token comment"># Container bridge-alpine</span>
+$ tcpdump -i veth80ec58c -v -nn -e -t
+tcpdump: listening on veth80ec58c, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size <span class="token number">262144</span> bytes
+02:42:ac:11:00:03 <span class="token operator">></span> ff:ff:ff:ff:ff:ff, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Request who-has <span class="token number">172.17</span>.0.2 tell <span class="token number">172.17</span>.0.3, length <span class="token number">28</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Reply <span class="token number">172.17</span>.0.2 is-at 02:42:ac:11:00:02, length <span class="token number">28</span>
+02:42:ac:11:00:03 <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">7910</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.3 <span class="token operator">></span> <span class="token number">172.17</span>.0.2: ICMP <span class="token builtin class-name">echo</span> request, <span class="token function">id</span> <span class="token number">16</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">59835</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>none<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2 <span class="token operator">></span> <span class="token number">172.17</span>.0.3: ICMP <span class="token builtin class-name">echo</span> reply, <span class="token function">id</span> <span class="token number">16</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+
+<span class="token comment"># Container bridge-alpine3</span>
+$ tcpdump -i vethd234967 -v -nn -e -t
+tcpdump: listening on vethd234967, link-type EN10MB <span class="token punctuation">(</span>Ethernet<span class="token punctuation">)</span>, capture size <span class="token number">262144</span> bytes
+02:42:ac:11:00:03 <span class="token operator">></span> ff:ff:ff:ff:ff:ff, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Request who-has <span class="token number">172.17</span>.0.2 tell <span class="token number">172.17</span>.0.3, length <span class="token number">28</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="Network-traffic-analysis"><a href="#Network-traffic-analysis" class="headerlink" title="Network traffic analysis"></a>Network traffic analysis</h3><p>According to the results that are shown above, the process is a bit different:</p>
+<ol>
+<li><strong>Use ARP to get the MAC address of the target container：</strong></li>
+</ol>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># bridge-alpine2 container</span>
+$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+<span class="token number">0.0</span>.0.0         <span class="token number">172.17</span>.0.1      <span class="token number">0.0</span>.0.0         UG    <span class="token number">0</span>      <span class="token number">0</span>        <span class="token number">0</span> eth0
+<span class="token number">172.17</span>.0.0      <span class="token number">0.0</span>.0.0         <span class="token number">255.255</span>.0.0     U     <span class="token number">0</span>      <span class="token number">0</span>        <span class="token number">0</span> eth0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>According to the IP routing table of container bridge-alpine2 shown above, when the container wants to ping another container in the same subnet(172.17.0.0/16), the message can be directly sent to them, instead of being sent to the gateway. But it needs to know the MAC address of the target container first.</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># bridge-alpine2's packages</span>
+02:42:ac:11:00:03 <span class="token operator">></span> ff:ff:ff:ff:ff:ff, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Request who-has <span class="token number">172.17</span>.0.2 tell <span class="token number">172.17</span>.0.3, length <span class="token number">28</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Reply <span class="token number">172.17</span>.0.2 is-at 02:42:ac:11:00:02, length <span class="token number">28</span>
+
+<span class="token comment"># docker0's packcages </span>
+02:42:ac:11:00:03 <span class="token operator">></span> **ff:ff:ff:ff:ff:ff**, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Request who-has <span class="token number">172.17</span>.0.2 tell <span class="token number">172.17</span>.0.3, length <span class="token number">28</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Reply <span class="token number">172.17</span>.0.2 is-at 02:42:ac:11:00:02, length <span class="token number">28</span>
+
+<span class="token comment"># bridge-alpine's packages</span>
+02:42:ac:11:00:03 <span class="token operator">></span> **ff:ff:ff:ff:ff:ff**, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Request who-has <span class="token number">172.17</span>.0.2 tell <span class="token number">172.17</span>.0.3, length <span class="token number">28</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Reply <span class="token number">172.17</span>.0.2 is-at 02:42:ac:11:00:02, length <span class="token number">28</span>
+
+<span class="token comment"># bridge-alpine3's packages</span>
+02:42:ac:11:00:03 <span class="token operator">></span> **ff:ff:ff:ff:ff:ff**, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Request who-has <span class="token number">172.17</span>.0.2 tell <span class="token number">172.17</span>.0.3, length <span class="token number">28</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>So, from the content shown above, we can observe that the container broadcasted the ARP message using the broadcast MAC address(<strong>ff:ff:ff:ff:ff:ff</strong>). ARP request will be sent to all the containers which are connecting to docker0, but only the target container bridge-alpine(172.17.0.2) replied with its MAC address(02:42:ac:11:00:02).</p>
+<ol>
+<li><strong>Send packages (ICMP)</strong></li>
+</ol>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># bridge-alpine2's packages</span>
+02:42:ac:11:00:03 <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">56762</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.3 <span class="token operator">></span> <span class="token number">172.17</span>.0.2: ICMP <span class="token builtin class-name">echo</span> request, <span class="token function">id</span> <span class="token number">17</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">55430</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>none<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2 <span class="token operator">></span> <span class="token number">172.17</span>.0.3: ICMP <span class="token builtin class-name">echo</span> reply, <span class="token function">id</span> <span class="token number">17</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+
+<span class="token comment"># docker0's packages</span>
+02:42:ac:11:00:03 <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">7910</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.3 <span class="token operator">></span> <span class="token number">172.17</span>.0.2: ICMP <span class="token builtin class-name">echo</span> request, <span class="token function">id</span> <span class="token number">16</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">59835</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>none<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2 <span class="token operator">></span> <span class="token number">172.17</span>.0.3: ICMP <span class="token builtin class-name">echo</span> reply, <span class="token function">id</span> <span class="token number">16</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+
+<span class="token comment"># bridge-alpine's packages</span>
+02:42:ac:11:00:03 <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">7910</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.3 <span class="token operator">></span> <span class="token number">172.17</span>.0.2: ICMP <span class="token builtin class-name">echo</span> request, <span class="token function">id</span> <span class="token number">16</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:ac:11:00:03, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">59835</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>none<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2 <span class="token operator">></span> <span class="token number">172.17</span>.0.3: ICMP <span class="token builtin class-name">echo</span> reply, <span class="token function">id</span> <span class="token number">16</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>With the IP and MAC address, now container bridge-alpine2 can start to send IMCP messages to container bridge-alpine:</p>
+<p><img src="/img/docker_bridge_internal.png" alt="docker_bridge_internal.png" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="/img/docker_bridge_internal.png" class="lozad post-image"></p>
+<h2 id="Communicate-with-external-network"><a href="#Communicate-with-external-network" class="headerlink" title="Communicate with external network"></a>Communicate with external network</h2><p>Let’s see what will happen if this container tries to access an <code>external network</code>. The original state of the local environment is shown below:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Show the system ARP cache </span>
+$ arp -v
+Address                  HWtype  HWaddress           Flags Mask            Iface
+gateway                  ether   <span class="token number">70</span>:db:98:82:a1:c0   C                     ens192<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Container bridge-alpine2 and bridge-alpine3 have been removed from the local host.</p>
+<p>We can ping a website from a container and use <code>tcpdump</code> to catch the packets during this process:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Ping a website from container with bridge network type</span>
+$ docker <span class="token builtin class-name">exec</span> bridge-alpine <span class="token function">ping</span> www.baidu.com
+PING www.baidu.com <span class="token punctuation">(</span><span class="token number">103.235</span>.46.40<span class="token punctuation">)</span>: <span class="token number">56</span> data bytes
+<span class="token number">64</span> bytes from <span class="token number">103.235</span>.46.40: <span class="token assign-left variable">seq</span><span class="token operator">=</span><span class="token number">1</span> <span class="token assign-left variable">ttl</span><span class="token operator">=</span><span class="token number">40</span> <span class="token assign-left variable">time</span><span class="token operator">=</span><span class="token number">186.518</span> ms
+<span class="token number">64</span> bytes from <span class="token number">103.235</span>.46.40: <span class="token assign-left variable">seq</span><span class="token operator">=</span><span class="token number">2</span> <span class="token assign-left variable">ttl</span><span class="token operator">=</span><span class="token number">40</span> <span class="token assign-left variable">time</span><span class="token operator">=</span><span class="token number">187.523</span> ms
+<span class="token punctuation">..</span>.
+
+<span class="token comment"># Get packets from one of the endpoints of the veth pairs which connects </span>
+<span class="token comment"># container's network namespace and docker0</span>
+$ tcpdump -i veth80ec58c -v -nn -e
+02:42:ac:11:00:02 <span class="token operator">></span> 02:42:a1:f9:0a:ad, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Request who-has **172.17.0.1** tell <span class="token number">172.17</span>.0.2, length <span class="token number">28</span>
+02:42:a1:f9:0a:ad <span class="token operator">></span> 02:42:ac:11:00:02, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Reply <span class="token number">172.17</span>.0.1 is-at **02:42:a1:f9:0a:ad**, length <span class="token number">2806</span>:38:42.580163 ARP, Reply localhost.localdomain is-at 02:42:8a:b4:55:4d <span class="token punctuation">(</span>oui Unknown<span class="token punctuation">)</span>, length <span class="token number">28</span>
+02:42:ac:11:00:02 <span class="token operator">></span> **02:42:a1:f9:0a:ad**, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">73</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">46041</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">59</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2.37221 <span class="token operator">></span> <span class="token number">8.8</span>.8.8.53: <span class="token number">28492</span>+ A? www.baidu.com. <span class="token punctuation">(</span><span class="token number">31</span><span class="token punctuation">)</span>
+02:42:ac:11:00:02 <span class="token operator">></span> **02:42:a1:f9:0a:ad**, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">73</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">53494</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">59</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2.37221 <span class="token operator">></span> <span class="token number">8.8</span>.4.4.53: <span class="token number">28492</span>+ A? www.baidu.com. <span class="token punctuation">(</span><span class="token number">31</span><span class="token punctuation">)</span>
+02:42:ac:11:00:02 <span class="token operator">></span> **02:42:a1:f9:0a:ad**, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">73</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">46042</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">59</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2.37221 <span class="token operator">></span> <span class="token number">8.8</span>.8.8.53: <span class="token number">29411</span>+ AAAA? www.baidu.com. <span class="token punctuation">(</span><span class="token number">31</span><span class="token punctuation">)</span>
+02:42:ac:11:00:02 <span class="token operator">></span> **02:42:a1:f9:0a:ad**, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">73</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">53495</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">59</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2.37221 <span class="token operator">></span> <span class="token number">8.8</span>.4.4.53: <span class="token number">29411</span>+ AAAA? www.baidu.com. <span class="token punctuation">(</span><span class="token number">31</span><span class="token punctuation">)</span>
+**02:42:a1:f9:0a:ad** <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">132</span>: <span class="token punctuation">(</span>tos 0x20, ttl <span class="token number">101</span>, <span class="token function">id</span> <span class="token number">57650</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>none<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">118</span><span class="token punctuation">)</span>
+    <span class="token number">8.8</span>.8.8.53 <span class="token operator">></span> <span class="token number">172.17</span>.0.2.37221: <span class="token number">28492</span> <span class="token number">3</span>/0/0 www.baidu.com. CNAME www.a.shifen.com., www.a.shifen.com. A <span class="token number">14.215</span>.177.38, www.a.shifen.com. A <span class="token number">14.215</span>.177.39 <span class="token punctuation">(</span><span class="token number">90</span><span class="token punctuation">)</span>
+**02:42:a1:f9:0a:ad** <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">157</span>: <span class="token punctuation">(</span>tos 0x20, ttl <span class="token number">101</span>, <span class="token function">id</span> <span class="token number">29948</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>none<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">143</span><span class="token punctuation">)</span>
+    <span class="token number">8.8</span>.8.8.53 <span class="token operator">></span> <span class="token number">172.17</span>.0.2.37221: <span class="token number">29411</span> <span class="token number">1</span>/1/0 www.baidu.com. CNAME www.a.shifen.com. <span class="token punctuation">(</span><span class="token number">115</span><span class="token punctuation">)</span>
+02:42:ac:11:00:02 <span class="token operator">></span> **02:42:a1:f9:0a:ad**, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">31149</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2 <span class="token operator">></span> <span class="token number">14.215</span>.177.38: ICMP <span class="token builtin class-name">echo</span> request, <span class="token function">id</span> <span class="token number">69</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+**02:42:a1:f9:0a:ad** <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x20, ttl <span class="token number">51</span>, <span class="token function">id</span> <span class="token number">31149</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">14.215</span>.177.38 <span class="token operator">></span> <span class="token number">172.17</span>.0.2: ICMP <span class="token builtin class-name">echo</span> reply, <span class="token function">id</span> <span class="token number">69</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="Network-traffic-analysis-1"><a href="#Network-traffic-analysis-1" class="headerlink" title="Network traffic analysis"></a>Network traffic analysis</h3><p>There’re several steps shown in this process, let’s go through them one by one:</p>
+<ol>
+<li><strong>Use ARP to get the MAC address of the gateway：</strong></li>
+</ol>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># bridge-alpine container</span>
+$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+<span class="token number">0.0</span>.0.0         <span class="token number">172.17</span>.0.1      <span class="token number">0.0</span>.0.0         UG    <span class="token number">0</span>      <span class="token number">0</span>        <span class="token number">0</span> eth0
+<span class="token number">172.17</span>.0.0      <span class="token number">0.0</span>.0.0         <span class="token number">255.255</span>.0.0     U     <span class="token number">0</span>      <span class="token number">0</span>        <span class="token number">0</span> eth0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>Different from communicating with containers also connecting to docker0, Both DNS/ICMP messages need to be sent to external networks. In this case, according to the table shown above, container bridge-alpine should directly send messages to the gateway(172.17.0.1)</p>
+<p>Somehow knowing the IP of the gateway is not enough for the packages to be delivered, they need the MAC address as well, so that the container used <code>ARP</code> to ask for the <code>MAC address</code> of the gateway(do not need to board cast):</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">02:42:ac:11:00:02 <span class="token operator">></span> 02:42:a1:f9:0a:ad, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Request who-has **172.17.0.1** tell <span class="token number">172.17</span>.0.2, length <span class="token number">28</span>
+02:42:a1:f9:0a:ad <span class="token operator">></span> 02:42:ac:11:00:02, ethertype ARP <span class="token punctuation">(</span>0x0806<span class="token punctuation">)</span>, length <span class="token number">42</span>: Ethernet <span class="token punctuation">(</span>len <span class="token number">6</span><span class="token punctuation">)</span>, IPv4 <span class="token punctuation">(</span>len <span class="token number">4</span><span class="token punctuation">)</span>, Reply <span class="token number">172.17</span>.0.1 is-at **02:42:a1:f9:0a:ad**, length <span class="token number">2806</span>:38:42.580163 ARP, Reply localhost.localdomain is-at 02:42:8a:b4:55:4d <span class="token punctuation">(</span>oui Unknown<span class="token punctuation">)</span>, length <span class="token number">28</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>According to what we’ve got previously, the MAC address <code>02:42:a1:f9:0a:ad</code> the container got from ARP is the MAC address of docker0 on the host computer:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ <span class="token function">ip</span> <span class="token function">link</span> show
+<span class="token punctuation">..</span>.
+<span class="token number">3</span>: docker0: <span class="token operator">&lt;</span>NO-CARRIER,BROADCAST,MULTICAST,UP<span class="token operator">></span> mtu <span class="token number">1500</span> qdisc noqueue state DOWN mode DEFAULT group default 
+    link/ether **02:42:8a:b4:55:4d** brd ff:ff:ff:ff:ff:ff
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ol>
+<li><strong>Resolve domain name (DNS)：</strong></li>
+</ol>
+<p>Also, the container needs to know the IP address of the target website, so that it will ask the name server(8.8.8.8) in order to resolve the domain name:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">02:42:ac:11:00:02 <span class="token operator">></span> **02:42:a1:f9:0a:ad**, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">73</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">46041</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">59</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2.37221 <span class="token operator">></span> <span class="token number">8.8</span>.8.8.53: <span class="token number">28492</span>+ A? www.baidu.com. <span class="token punctuation">(</span><span class="token number">31</span><span class="token punctuation">)</span>
+02:42:ac:11:00:02 <span class="token operator">></span> **02:42:a1:f9:0a:ad**, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">73</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">53494</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">59</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2.37221 <span class="token operator">></span> <span class="token number">8.8</span>.4.4.53: <span class="token number">28492</span>+ A? www.baidu.com. <span class="token punctuation">(</span><span class="token number">31</span><span class="token punctuation">)</span>
+02:42:ac:11:00:02 <span class="token operator">></span> **02:42:a1:f9:0a:ad**, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">73</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">46042</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">59</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2.37221 <span class="token operator">></span> <span class="token number">8.8</span>.8.8.53: <span class="token number">29411</span>+ AAAA? www.baidu.com. <span class="token punctuation">(</span><span class="token number">31</span><span class="token punctuation">)</span>
+02:42:ac:11:00:02 <span class="token operator">></span> **02:42:a1:f9:0a:ad**, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">73</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">53495</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">59</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2.37221 <span class="token operator">></span> <span class="token number">8.8</span>.4.4.53: <span class="token number">29411</span>+ AAAA? www.baidu.com. <span class="token punctuation">(</span><span class="token number">31</span><span class="token punctuation">)</span>
+**02:42:a1:f9:0a:ad** <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">132</span>: <span class="token punctuation">(</span>tos 0x20, ttl <span class="token number">101</span>, <span class="token function">id</span> <span class="token number">57650</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>none<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">118</span><span class="token punctuation">)</span>
+    <span class="token number">8.8</span>.8.8.53 <span class="token operator">></span> <span class="token number">172.17</span>.0.2.37221: <span class="token number">28492</span> <span class="token number">3</span>/0/0 www.baidu.com. CNAME www.a.shifen.com., www.a.shifen.com. A <span class="token number">14.215</span>.177.38, www.a.shifen.com. A <span class="token number">14.215</span>.177.39 <span class="token punctuation">(</span><span class="token number">90</span><span class="token punctuation">)</span>
+**02:42:a1:f9:0a:ad** <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">157</span>: <span class="token punctuation">(</span>tos 0x20, ttl <span class="token number">101</span>, <span class="token function">id</span> <span class="token number">29948</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>none<span class="token punctuation">]</span>, proto UDP <span class="token punctuation">(</span><span class="token number">17</span><span class="token punctuation">)</span>, length <span class="token number">143</span><span class="token punctuation">)</span>
+    <span class="token number">8.8</span>.8.8.53 <span class="token operator">></span> <span class="token number">172.17</span>.0.2.37221: <span class="token number">29411</span> <span class="token number">1</span>/1/0 www.baidu.com. CNAME www.a.shifen.com. <span class="token punctuation">(</span><span class="token number">115</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>I’m not going to talk about the detail of DNS in this article. We only need to know that eventually, the container knew that the target IP is <code>14.215.177.38</code>.</p>
+<ol>
+<li><strong>Send packages (ICMP):</strong></li>
+</ol>
+<p>Now that the container’s already got the IP address of the target website and the MAC address of the gateway, it can send all the ICMP packages now:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">02:42:ac:11:00:02 <span class="token operator">></span> **02:42:a1:f9:0a:ad**, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">64</span>, <span class="token function">id</span> <span class="token number">31149</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">172.17</span>.0.2 <span class="token operator">></span> <span class="token number">14.215</span>.177.38: ICMP <span class="token builtin class-name">echo</span> request, <span class="token function">id</span> <span class="token number">69</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span>
+**02:42:a1:f9:0a:ad** <span class="token operator">></span> 02:42:ac:11:00:02, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x20, ttl <span class="token number">51</span>, <span class="token function">id</span> <span class="token number">31149</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">14.215</span>.177.38 <span class="token operator">></span> <span class="token number">172.17</span>.0.2: ICMP <span class="token builtin class-name">echo</span> reply, <span class="token function">id</span> <span class="token number">69</span>, <span class="token function">seq</span> <span class="token number">0</span>, length <span class="token number">64</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>If we also use <code>tcpdump</code> to catch the package from ens192, we will get these contents:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ tcpdump -i ens192 -v -nn -e -t <span class="token function">host</span> <span class="token number">14.215</span>.177.38
+00:50:56:ba:06:b7 <span class="token operator">></span> <span class="token number">70</span>:db:98:82:a1:c0, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x0, ttl <span class="token number">63</span>, <span class="token function">id</span> <span class="token number">13766</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">10.103</span>.80.33 <span class="token operator">></span> <span class="token number">14.215</span>.177.38: ICMP <span class="token builtin class-name">echo</span> request, <span class="token function">id</span> <span class="token number">113</span>, <span class="token function">seq</span> <span class="token number">20</span>, length <span class="token number">64</span>
+<span class="token number">70</span>:db:98:82:a1:c0 <span class="token operator">></span> 00:50:56:ba:06:b7, ethertype IPv4 <span class="token punctuation">(</span>0x0800<span class="token punctuation">)</span>, length <span class="token number">98</span>: <span class="token punctuation">(</span>tos 0x20, ttl <span class="token number">41</span>, <span class="token function">id</span> <span class="token number">13766</span>, offset <span class="token number">0</span>, flags <span class="token punctuation">[</span>DF<span class="token punctuation">]</span>, proto ICMP <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>, length <span class="token number">84</span><span class="token punctuation">)</span>
+    <span class="token number">45.113</span>.192.101 <span class="token operator">></span> <span class="token number">10.103</span>.80.33: ICMP <span class="token builtin class-name">echo</span> reply, <span class="token function">id</span> <span class="token number">113</span>, <span class="token function">seq</span> <span class="token number">20</span>, length <span class="token number">64</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>The whole process can be shown as:<br><img src="/img/docker_bridge_external.png" alt="docker_bridge_external.png" srcset="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20300%20300'%3E%3C/svg%3E" data-src="/img/docker_bridge_external.png" class="lozad post-image"></p>
+
+  </div>
+  <div>
+    
+      <div 
+        class="post-note note-warning copyright" 
+        style="margin-top: 42px">
+        <p>
+          <span style="font-weight: bold;">作者：</span><a 
+            target="_blank" 
+            rel="nofollow noopener noreferrer" 
+            href="/en/about">
+            lz-nsc
+          </a>
+        </p>
+        <p>
+          <span style="font-weight: bold;">文章链接：</span><a 
+            target="_blank" 
+            rel="nofollow noopener noreferrer" 
+            href="http://lzreload.com/en/2022/09/16/Docker-NetWork-1/">
+            http://lzreload.com/en/2022/09/16/Docker-NetWork-1/
+          </a>
+        </p>
+        <p><span style="font-weight: bold;">版权声明：</span>本博客所有文章除特别声明外，均采用<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0 协议</a>。转载请注明出处！</p>
+      </div>
+    
+  </div>
+</article>
+<div class="nav">
+  
+  
+    <div class="nav-item-next">
+      <a 
+        href="/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/" 
+        class="nav-link">
+        <div>
+          <div class="nav-label">Next</div>
+          
+            <div class="nav-title">About Kubernetes configuration: ConfigMap </div>
+          
+        </div>
+        <i class="iconfont icon-right nav-next-icon"></i>
+      </a>
+    </div>
+  
+</div>
+
+  <div 
+    class="card card-content comment-card" 
+    style="margin-top: 16px;">
+    <div class="comment-card-title">评论</div>
+    
+  <div id="vcomments"></div>
+  
+  <script>
+    loadScript("//unpkg.com/valine/dist/Valine.min.js");
+    var oldLoadVa = window.onload;
+    window.onload = function () {
+      oldLoadVa && oldLoadVa();
+      new Valine({
+        el: '#vcomments',
+        appId: '6AA1gXvoIRhGdQhCpYejA0Us-gzGzoHsz',
+        appKey: 'OyxvagUt7NEgTT0JB4WwWIzx',
+        placeholder: 'Comment',
+        path: window.location.pathname,
+        avatar: 'mp',
+        meta: ["nick","mail","link"],
+        pageSize: '10',
+        lang: '',
+        visitor: 'false',
+        highlight: true,
+        recordIP: true,
+        
+        
+        
+        enableQQ: 'false',
+        requiredFields: [],
+      });
+    };
+  </script>
+
+  </div>
+
+<div 
+  class="card card-content toc-card" 
+  id="mobiletoc">
+  <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>TOC
+</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Overview"><span class="toc-text">Overview</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#None"><span class="toc-text">None</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Host"><span class="toc-text">Host</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Bridge"><span class="toc-text">Bridge</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#About-Bridge-mode"><span class="toc-text">About Bridge mode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-container-with-bridge-mode-default"><span class="toc-text">Create container with bridge mode(default):</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Communication-between-pods"><span class="toc-text">Communication between pods</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Network-traffic-analysis"><span class="toc-text">Network traffic analysis</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Communicate-with-external-network"><span class="toc-text">Communicate with external network</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Network-traffic-analysis-1"><span class="toc-text">Network traffic analysis</span></a></li></ol></li></ol></li></ol>
+</div></main>
+            <aside class="left-column">
+              
+              <div class="card card-author">
+                
+  <img 
+    src="/img/author.png" 
+    class="author-img"
+    width="88"
+    height="88"
+    alt="author avatar">
+
+<p class="author-name">lz-nsc</p>
+<p class="author-description"></p>
+<div class="author-message">
+  <a 
+    class="author-posts-count" 
+    href="/en/archives">
+    <span>3</span>
+    <span>Posts</span>
+  </a>
+  <a 
+    class="author-categories-count" 
+    href="/en/categories">
+    <span>0</span>
+    <span>Categories</span>
+  </a>
+  <a 
+    class="author-tags-count" 
+    href="/en/tags">
+    <span>4</span>
+    <span>Tags</span>
+  </a>
+</div>
+
+              </div>
+               <div class="sticky-tablet">
+  
+  
+    <article class="display-when-two-columns spacer">
+      <div class="card card-content toc-card">
+        <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>TOC
+</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Overview"><span class="toc-text">Overview</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#None"><span class="toc-text">None</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Host"><span class="toc-text">Host</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Bridge"><span class="toc-text">Bridge</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#About-Bridge-mode"><span class="toc-text">About Bridge mode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-container-with-bridge-mode-default"><span class="toc-text">Create container with bridge mode(default):</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Communication-between-pods"><span class="toc-text">Communication between pods</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Network-traffic-analysis"><span class="toc-text">Network traffic analysis</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Communicate-with-external-network"><span class="toc-text">Communicate with external network</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Network-traffic-analysis-1"><span class="toc-text">Network traffic analysis</span></a></li></ol></li></ol></li></ol>
+      </div>
+    </article>
+  
+  
+  <article class="card card-content categories-widget">
+    <div class="categories-card">
+  <div class="categories-header">
+    <i 
+      class="iconfont icon-fenlei" 
+      style="padding-right: 2px;">
+    </i>Categories
+  </div>
+  <div class="categories-list">
+    
+  </div>
+</div>
+  </article>
+  
+  <article class="card card-content tags-widget">
+    <div class="tags-card">
+  <div class="tags-header">
+    <i 
+      class="iconfont icon-biaoqian" 
+      style="padding-right: 2px;">
+    </i>hot tags
+  </div>
+  <div class="tags-list">
+    
+      <a 
+        href="/en/tags/Golang/" 
+        title="Golang">
+        <div class="tags-list-item">Golang</div>
+      </a>
+    
+      <a 
+        href="/en/tags/Network/" 
+        title="Network">
+        <div class="tags-list-item">Network</div>
+      </a>
+    
+      <a 
+        href="/en/tags/Docker/" 
+        title="Docker">
+        <div class="tags-list-item">Docker</div>
+      </a>
+    
+      <a 
+        href="/en/tags/Kubernetes/" 
+        title="Kubernetes">
+        <div class="tags-list-item">Kubernetes</div>
+      </a>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+            </aside>
+            <aside class="right-column">
+              <div class="sticky-widescreen">
+  
+  
+    <article class="card card-content toc-card">
+      <div class="toc-header">
+  <i 
+    class="iconfont icon-menu" 
+    style="padding-right: 2px;">
+  </i>TOC
+</div>
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Overview"><span class="toc-text">Overview</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#None"><span class="toc-text">None</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Host"><span class="toc-text">Host</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Bridge"><span class="toc-text">Bridge</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#About-Bridge-mode"><span class="toc-text">About Bridge mode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Create-container-with-bridge-mode-default"><span class="toc-text">Create container with bridge mode(default):</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Communication-between-pods"><span class="toc-text">Communication between pods</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Network-traffic-analysis"><span class="toc-text">Network traffic analysis</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Communicate-with-external-network"><span class="toc-text">Communicate with external network</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Network-traffic-analysis-1"><span class="toc-text">Network traffic analysis</span></a></li></ol></li></ol></li></ol>
+    </article>
+  
+  
+  <article class="card card-content">
+    <div class="recent-posts-card">
+  <div class="recent-posts-header">
+    <i 
+      class="iconfont icon-wenzhang_huaban" 
+      style="padding-right: 2px;">
+    </i>Recent Posts
+  </div>
+  <div class="recent-posts-list">
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-09-16</div>
+        <a href="/en/2022/09/16/Docker-NetWork-1/"><div class="recent-posts-item-content">About Docker network - Part 1</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-05-08</div>
+        <a href="/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/"><div class="recent-posts-item-content">About Kubernetes configuration: ConfigMap</div></a>
+      </div>
+    
+      <div class="recent-posts-item">
+        <div class="recent-posts-item-title">2022-04-15</div>
+        <a href="/en/2022/04/15/Golang-Heap/"><div class="recent-posts-item-content">Go: About package heap</div></a>
+      </div>
+    
+  </div>
+</div>
+  </article>
+  
+  
+</div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+     
+    <footer class="footer">
+  <div class="footer-container">
+    <div>
+      <div class="footer-dsc">
+        <span>
+          Copyright ©
+          
+            2022
+          
+          
+        </span>
+        &nbsp;
+        <a 
+          href="/en/" 
+          class="footer-link">
+          Lynn's blog
+        </a>
+      </div>
+    </div>
+
+    
+      <div class="footer-dsc">
+        
+          Powered by
+          <a 
+            href="https://hexo.io/" 
+            class="footer-link" 
+            target="_blank" 
+            rel="nofollow noopener noreferrer">
+            &nbsp;Hexo
+          </a>
+        
+        
+        
+      </div>
+    
+    
+    
+    
+      <div class="footer-dsc">
+        
+          本站总访问量<span id="busuanzi_value_site_pv"></span>次
+        
+        
+          <span>&nbsp;|&nbsp;</span>
+        
+        
+          本站总访客数<span id="busuanzi_value_site_uv"></span>次
+        
+      </div>
+      
+    
+</footer>
+ 
+    
+  <a 
+    role="button" 
+    id="scrollbutton" 
+    class="basebutton" 
+    aria-label="回到顶部">
+    <i class="iconfont icon-arrowleft button-icon"></i>
+  </a>
+
+<a 
+  role="button" 
+  id="menubutton"
+  aria-label="menu button"
+  class="basebutton">
+  <i class="iconfont icon-menu button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="popbutton" 
+  class="basebutton" 
+  aria-label="控制中心">
+  <i class="iconfont icon-expand button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="darkbutton" 
+  class="basebutton darkwidget" 
+  aria-label="夜色模式">
+  <i class="iconfont icon-weather button-icon"></i>
+</a>
+<a 
+  role="button" 
+  id="searchbutton" 
+  class="basebutton searchwidget" 
+  aria-label="搜索">
+  <i class="iconfont icon-search button-icon"></i>
+</a> 
+     
+     
+     
+      <script>
+  var addImgLayout = function () {
+    var img = document.querySelectorAll('.post-content img')
+    var i
+    for (i = 0; i < img.length; i++) {
+      var wrapper = document.createElement('a')
+      wrapper.setAttribute('href', img[i].getAttribute('data-src'))
+      wrapper.setAttribute('aria-label', 'illustration')
+      wrapper.style.cssText =
+        'width: 100%; display: flex; justify-content: center;'
+      if (img[i].alt) wrapper.dataset.caption = img[i].alt
+      wrapper.dataset.nolink = true
+      img[i].before(wrapper)
+      wrapper.append(img[i])
+      var divWrap = document.createElement('div')
+      divWrap.classList.add('gallery')
+      wrapper.before(divWrap)
+      divWrap.append(wrapper)
+    }
+    baguetteBox.run('.gallery')
+  }
+</script>
+<script>
+  loadScript(
+    "/en/js/lib/lightbox/baguetteBox.min.js",
+    addImgLayout
+  )
+</script>
+ 
+     
+     
+    <script src="/en/js/main.js"></script> 
+    
+      <script> 
+        loadScript('/en/js/lib/busuanzi.min.js') 
+      </script>
+     
+    
+      <script>
+        var addLazyload = function () {
+          var observer = lozad('.lozad', {
+            load: function (el) {
+              el.srcset = el.getAttribute('data-src')
+            },
+            loaded: function (el) {
+              el.classList.add('loaded')
+            },
+          })
+          observer.observe()
+        }
+      </script>
+      <script>
+        loadScript('/en/js/lib/lozad.min.js', addLazyload)
+      </script>
+     
+    
+    
+  </body>
+</html>

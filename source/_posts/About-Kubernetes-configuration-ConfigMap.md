@@ -2,6 +2,7 @@
 title: 'About Kubernetes configuration: ConfigMap'
 date: 2022-05-08 19:38:32
 tags: Kubernetes
+comments: true
 ---
 
 # Kubernete Configuration - ConfigMap

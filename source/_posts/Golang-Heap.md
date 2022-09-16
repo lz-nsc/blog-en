@@ -130,7 +130,7 @@ func main() {
 
 The `Init` function will build the heap like this:
 
-![build_heap.png](/img/build_heap.png)
+![build_heap.png](build_heap.png)
 
 The output of previous code will be:
 
@@ -177,7 +177,7 @@ func main() {
 
 The `Pop` function will process the `Minheap` as:
 
-![pop_heap.png](/img/pop_heap.png)
+![pop_heap.png](pop_heap.png)
 
 The output of previous code will be:
 
@@ -230,7 +230,7 @@ func main() {
 
 The `Push` function will process like this:
 
-![push_heap.png](/img/push_heap.png)
+![push_heap.png](push_heap.png)
 
 And the output of previous code will be:
 
@@ -281,7 +281,7 @@ func main() {
 
 The `Fix` function will process like this:
 
-![Fix_heap.png](/img/Fix_heap.png)
+![Fix_heap.png](Fix_heap.png)
 
 And the output of previous code will be:
 
@@ -332,7 +332,7 @@ func main(){
 
 The `Remove` function will process like this:
 
-![Remove_heap.png](/img/Remove_heap.png)
+![Remove_heap.png](Remove_heap.png)
 
 And the output of previous code will be:
 

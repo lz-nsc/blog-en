@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://lzreload.com/en/2022/09/22/Deploy-cluster-on-Vsphere-using-cluster-api/</loc>
+    
+    <lastmod>2022-09-22</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://lzreload.com/en/2022/04/15/Golang-Heap/</loc>
     
     <lastmod>2022-09-16</lastmod>
@@ -25,7 +32,7 @@
 
   <url>
     <loc>http://lzreload.com/en</loc>
-    <lastmod>2022-09-16</lastmod>
+    <lastmod>2022-09-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -33,28 +40,35 @@
   
   <url>
     <loc>http://lzreload.com/en/tags/Kubernetes/</loc>
-    <lastmod>2022-09-16</lastmod>
+    <lastmod>2022-09-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://lzreload.com/en/tags/Cluster-API/</loc>
+    <lastmod>2022-09-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://lzreload.com/en/tags/Docker/</loc>
-    <lastmod>2022-09-16</lastmod>
+    <lastmod>2022-09-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://lzreload.com/en/tags/Network/</loc>
-    <lastmod>2022-09-16</lastmod>
+    <lastmod>2022-09-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://lzreload.com/en/tags/Golang/</loc>
-    <lastmod>2022-09-16</lastmod>
+    <lastmod>2022-09-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>

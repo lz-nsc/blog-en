@@ -6,6 +6,7 @@ tags:
     - Cluster API
 comments: true
 ---
+Recently, I've try to use `Cluster-api` to deploy a cluster on vsphere. During this process, I've met many different problems, so in this article, I'm going to talk about how to use this tool and how to deal with the problems that we might meet.
 <!-- more -->
 
 # Environment requirements

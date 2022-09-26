@@ -4,6 +4,7 @@ date: 2022-04-15 17:21:52
 tags: Golang 
 comments: true
 ---
+In this post, I will go throught all the interfaces and functions of golang's `container/heap` package and explain how it works. Also, I will use several simple examples to show how we can use it to create and use the heap structure that we want.
 <!-- more -->
 
 ## Interfaces

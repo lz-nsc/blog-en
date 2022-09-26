@@ -4,9 +4,8 @@ date: 2022-05-08 19:38:32
 tags: Kubernetes
 comments: true
 ---
+In this article, we are going to talk about serveral different ways to create and update ConfigMap in Kubernetes.
 <!-- more -->
-
-# Kubernete Configuration - ConfigMap
 
 # Creating ConfigMap
 

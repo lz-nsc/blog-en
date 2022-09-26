@@ -6,6 +6,8 @@ tags:
     - Network
 comments: true
 ---
+Networking of Docker is a topic that I always want to talk about, so in the upcoming several **`About Docker network`** posts, including this one, I will try to introduce different networking modes of Docker and explain how it works based on some experiments I've made.
+This blog post is focus on Docker's `none`, `host` and `bridege` network modes, others will be talked about in next posts.
 <!-- more -->
 
 # Overview
@@ -32,7 +34,7 @@ NETWORK ID     NAME      DRIVER    SCOPE
 
 # None
 
-Containers that are connected to `none` ****network will not have an external network interface:
+Containers that are connected to `none` network will not have an external network interface:
 
 ```bash
 # Create a container with `none` network mode 

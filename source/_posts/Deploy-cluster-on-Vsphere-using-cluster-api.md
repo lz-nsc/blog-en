@@ -6,6 +6,8 @@ tags:
     - Cluster API
 comments: true
 ---
+<!-- more -->
+
 # Environment requirements
 
 Make sure these tools are all installed:

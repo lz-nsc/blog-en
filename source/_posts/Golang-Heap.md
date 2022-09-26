@@ -4,6 +4,8 @@ date: 2022-04-15 17:21:52
 tags: Golang 
 comments: true
 ---
+<!-- more -->
+
 ## Interfaces
 Package `heap` defines `Interface` which contains `Interface` of package `sort`, and two methods: Push and Pop.
 

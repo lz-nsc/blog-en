@@ -1,0 +1,5 @@
+<% if(theme.footer.statistics.enable && theme.footer.statistics.type === 'busuanzi') { %>
+      <script> 
+        loadScript('<%= url_for(theme.cdn.busuanzi) %>') 
+      </script>
+<% }%>

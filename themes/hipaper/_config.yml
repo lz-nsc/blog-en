@@ -1,0 +1,167 @@
+# ---------------------------------------------------------------
+# Site Information Settings
+# ---------------------------------------------------------------
+
+# Header Menu
+menu:
+  Home: /
+  Archives: archives
+  Categories: categories
+  Tags: tags
+  # About: about
+rss: /atom.xml
+
+
+# Set default keywords (Use a comma to separate)
+keywords: ""
+
+# Put your favicon.ico into `hexo-site/themes/hipaper/source/` directory.
+favicon: css/images/favicon.ico
+
+
+# Put your avatar.jpg into `hexo-site/themes/hipaper/source/` directory.
+# url is target link (E.g. `url: https://hexo.io/logo.svg` or `url: css/images/mylogo.jpg`)
+avatar: 
+  enable: false
+  width: 124
+  height: 124
+  bottom: 10
+  url: https://hexo.io/logo.svg
+
+
+# AboutPage background, support multiple images.
+# about_big_image: [css/images/pose01.jpg, https://source.unsplash.com/collection/954550/1920x1080, https://source.unsplash.com/collection/954550/1920x1081]
+
+
+# Homepage thumbnail
+random_thumb: false
+
+
+# Content
+fancybox: false
+
+
+# Sidebar
+sidebar: right
+widgets:
+- search
+- social
+- recent_posts
+- category
+- tag
+- tagcloud
+- archive
+
+# Social Links
+# Key is the name of FontAwsome icon.
+# Value is the target link (E.g. GitHub: https://github.com/iTimeTraveler)
+social:
+  Github: https://github.com/lz-nsc
+  # Weibo: 
+  # Twitter: 
+  # Facebook: 
+  # Google-plus: 
+  # Instagram: 
+  Linkedin: https://www.linkedin.com/in/ziling-zhou-074286115
+
+
+
+# Search
+search:
+    insight: true # you need to install `hexo-generator-json-content` before using Insight Search
+    swiftype: # enter swiftype install key here
+    baidu: false # you need to disable other search engines to use Baidu search, options: true, false
+
+
+# # comment ShortName, you can choose only ONE to display.
+# duoshuo_shortname: 
+# disqus_shortname: 
+# livere_shortname: MTAyMC8yOTQ4MS82MDQ5
+# uyan_uid: 
+# wumii:
+
+comment:
+  enable: true
+  type: valine # valine | gitalk | livere | disqus | we recommend valine | waline
+  # gitalk config details can see in https://github.com/gitalk/gitalk/blob/master/readme-cn.md
+  # waline config details can see in https://waline.js.org
+  valine:
+    appId: 6AA1gXvoIRhGdQhCpYejA0Us-gzGzoHsz
+    appKey: OyxvagUt7NEgTT0JB4WwWIzx
+    placeholder: Comment
+    path: window.location.pathname
+    avatar: mp
+    meta: ["nick", "mail", "link"]
+    pageSize: 10
+    comment_count: true
+    visitor: false
+    highlight: true
+    recordIP: true
+    serverURLs: # leancloud国内自定义域名
+    emojiCDN:
+    emojiMaps: null
+    enableQQ: false
+    requiredFields: []
+    lang: en
+    
+highlight_theme: normal
+
+
+# widget behavior
+archive_type: 'monthly'
+show_count: true
+
+# Google Webmaster tools verification setting
+# See: https://www.google.com/webmasters/
+google_site_verification:
+baidu_site_verification:
+qihu_site_verification:
+
+twitter:
+google_plus:
+fb_admins:
+fb_app_id:
+
+#------------------------
+# Footer
+#------------------------
+footer:
+  statistics:
+    enable: true
+    type: busuanzi # now version only supports busuanzi
+    site_pv:
+      enable: true
+      style: "{} Site Views"  # the style will be shown as $1{pv}$2
+    site_uv:
+      enable: true
+      style: "{} Total Visitors" # the style will be shown as $1{uv}$2
+    page_pv:
+      enable: true
+      style: "{} Page Views" # the style will be shown as $1{pv}$2
+
+# Facebook SDK Support.
+# https://github.com/iissnan/hexo-theme-next/pull/410
+facebook_sdk:
+  enable: false
+  app_id:       #<app_id>
+  fb_admin:     #<user_id>
+  like_button:  #true
+  webmaster:    #true
+
+# CNZZ count
+cnzz_siteid: 1260716016
+cdn:
+  mathjax: //cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-svg.js
+  katex: //cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css
+  gitalk:
+    css: //cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css
+    js: //cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js
+  valine: //unpkg.com/valine/dist/Valine.min.js
+  livere: //cdn-city.livere.com/js/embed.dist.js
+  waline: //cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js
+  baguetteBox: /js/lib/lightbox
+  lozad: /js/lib/lozad.min.js
+  prism: /js/lib/prism/
+  busuanzi: /js/lib/busuanzi.min.js
+  artitalk: https://cdn.jsdelivr.net/npm/artitalk
+  md5: /js/lib/md5.min.js

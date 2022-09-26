@@ -1,0 +1,8 @@
+<!-- <% if (!index && theme.busuanzi_analytics){ %>
+	<span id="busuanzi_container_page_pv">
+	  Page views<span id="busuanzi_value_page_pv"></span>次
+	</span>
+<% } %> -->          
+<% if(!index && theme.footer.statistics.page_pv.enable) { %>
+	<%= theme.footer.statistics.page_pv.style.split('{}')[0] %><span id="busuanzi_value_page_pv"></span><%= theme.footer.statistics.page_pv.style.split('{}')[1] %>
+<% } %>

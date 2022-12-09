@@ -1,19 +1,21 @@
 ---
-title: Setup Kubernetes cluster
+title: Create your own Kubernetes cluster with kubeadm
 date: 2021-09-14 14:35:42
-updated: 2021-09-14 15:24:00
+updated: 2022-12-09 15:24:00
 tags:
     - Kubernetes
 categories:
 comments: true
-hidden: true
+
 ---
 
-This time I'm going to set up a `Kubernetes cluster` with `kubeadm` and record the whole process and problems.
+This article is about how to set up a `Kubernetes cluster` on our server with `kubeadm`, the problems we might meet during this process, and how to deal with them. Also, we can learn more about how the Kubernetes cluster works from this whole process.
+<!-- more -->
+
 
 # Preparation
 
-To set up the cluster, we need 2 virtual machines: One works as `Master node` while the other works as `worker node`, which allows me to do more tests related to cluster in the future.
+To set up the cluster, we need 2 virtual machines: One works as a `Master node` while the other works as a `worker node`, which allows me to do more tests related to the cluster in the future.
 
 Virtual Machine:
 
@@ -23,13 +25,13 @@ Tools:
 
 -   kubeadm
 
-kubeadm 是一个可以帮助一键搭建 Kubernetes 集群的工具。
+`kubeadm` is a tool that can help users easily create Kubernetes clusters.
 
-# 搭建 Master 节点
+# Create a Kubernetes control-plane node
 
-## #1 安装 kubeadm 以及相关工具
+## #1 Install kubeadm and related tools
 
-首先需要配置云服务器，安装需要的工具。
+First of all, we need to set up the server can install all the tools.
 
 ```bash
 $sudo apt-get update
@@ -38,14 +40,14 @@ $curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key ad
 OK
 ```
 
-需要将 Kubernetes 官方源添加到本地。
+Then we need to add Kubernetes's official package repository.
 
 ```
 #/etc/apt/sources.list.d/kubernetes.list
 deb http://apt.kubernetes.io/ kubernetes-xenial main
 ```
 
-将以上文件（/etc/apt/sources.list.d/kubernetes.list）添加了之后，运行以下命令可以看到此时 Kubernetes 的源已经被添加进来。
+After the file mentioned above（/etc/apt/sources.list.d/kubernetes.list）has been added, we can see that Kubenentes's package repository has been included when we run the command shown below:
 
 ```bash
 $sudo apt-get update
@@ -56,105 +58,113 @@ Get:6 https://packages.cloud.google.com/apt kubernetes-xenial/main amd64 Package
 ...
 ```
 
-在完成了以上的配置之后即可开始安装`kubelet`，`kubectl`以及`kubeadm`
+After the configuration above is done, we can start to install `kubelet`, `kubectl`, and `kubeadm`.
 
-`kubeadm`需要使用`kubelet`服务来以容器方式部署和启动 Kubernetes 的主要服务，所以需要安装并先启动 kubelet 服务。
-而`kubectl`则是客户端命令行工具，在集群搭建完成之后可以通过它查看集群信息与状态。
+`kubeadm` needs to use `kubelet` to deploy and run Kubernetes's services as containers, before the installation, we need to make sure `kubelet` service is running.
+
+`kubectl` is a command line tool that can be used to check the cluster's information and status after creating the cluster.
 
 ```bash
-# 安装kubelet，kubectl以及kubeadm
+# Install kubelet, kubectl and kubeadm
 $sudo apt-get install kubelet kubectl kubeadm
 ```
 
-要启动 kubelet 需要先安装并启动`docker`
+---
+
+### Using docker
+> When I first created a cluster on AWS, `docker` was still used by `kubelet` by default. Somehow now that seems `docker` has been deprecated by `Kubernetes` and when I try to use `kubeadm:v1.25.4` to create a cluster on Vsphere, `containerd` is used by default instead of `docker`. So, if you are not going to use docker, you can directly skip this section.
+
+To run `kubelet`, we need to install and run `docker`:
 
 ```bash
 $curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/debian/gpg | sudo apt-key add -
 OK
 
-# 要安装了 software-properties-common 才能使用 add-apt-repository
+# software-properties-common is needed for using add-apt-repository
 $sudo apt-get install software-properties-common
 $sudo add-apt-repository \
 "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/debian \
 $(lsb_release -cs) \
 stable"
 $sudo apt-get update
-# 安装docker
+# Install docker
 $sudo apt-get install docker-ce
 ```
-
-完成了以上所需工具的安装后就可以开始按顺序启动它们。
+After finishing the installation of all the tools that we need, we can start to run them by order.
 
 ```bash
-#启动docker
+#First start docker
 $systemctl start docker
 ```
 
-在 docker正常启动并确定docker的`cgroup driver`为`systemd`后（详情可见`错误及解决方案 #2`），可开始安装`Master节点`。
+After starting `docker` correctly and making sure that `cgroup driver` of docker is `systemd`(More details can be found in [`Troubleshooting #2`](#T2)), we can start to deploy `Master node` of the cluster.
 
-此时如果用`systemctl status kubelet`命令查看`kubelet`状态，可发现kubelet没有正常启动，报错为：
+---
+
+If now we use `systemctl status kubelet` command to check the status of `kubelet`, we can find out that `kubelet` didn't start correctly and the error message is:
 ```
  "Failed to load kubelet config file" err="failed to load Kubelet config file...
 ```
-这是因为还没有运行 `kubeadm init`命令，在这个命令运行了之后，`kubelet`的配置文件会被生成，`kubelet`也会自动重启并正常运行。
+This is because we haven't run `kubeadm init` command yet, after this command is executed, the config file for `kubelet` will be generated, and `kubelet` will restart and run correctly.
 
-## #2 使用 kubeadm 安装 Master 节点
+## #2 Use kubeadm to deploy Master node
 
-使用`kubeadm config`命令打印`kubeadm`的默认配置.
+Use `kubeadm config` command to print the default configuration of `kubeadm`.
 
 ```bash
-#输出kubeadm默认配置
+# Print default configuration of kubeadm
 $kubeadm config print init-defaults
-#将kubeadm默认配置保存到文件中方便做自定义修改
+#Save the default configuration of kubeadm to file to apply customize modification
 $kubeadm config print init-defaults >> init.default.yaml
 ```
 
-以下是`kubeadm`打印出来的默认配置:
+Here is the default configuration of `kubeadm`:
 
-```
+```yaml
 #init.default.yaml
 apiVersion: kubeadm.k8s.io/v1beta3
 bootstrapTokens:
-
--   groups:
-    -   system:bootstrappers:kubeadm:default-node-token
-        token: abcdef.0123456789abcdef
-        ttl: 24h0m0s
-        usages:
-    -   signing
-    -   authentication
-        kind: InitConfiguration
-        localAPIEndpoint:
-        advertiseAddress: 1.2.3.4
-        bindPort: 6443
-        nodeRegistration:
-        criSocket: /var/run/dockershim.sock
-        imagePullPolicy: IfNotPresent
-        name: node
-        taints: null
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: abcdef.0123456789abcdef
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: 1.2.3.4
+  bindPort: 6443
+nodeRegistration:
+  criSocket: /var/run/dockershim.sock
+  imagePullPolicy: IfNotPresent
+  name: node
+  taints: null
 
 ---
 
 apiServer:
-timeoutForControlPlane: 4m0s
+ timeoutForControlPlane: 4m0s
 apiVersion: kubeadm.k8s.io/v1beta3
 certificatesDir: /etc/kubernetes/pki
 clusterName: kubernetes
 controllerManager: {}
 dns: {}
 etcd:
-local:
-dataDir: /var/lib/etcd
+  local:
+  dataDir: /var/lib/etcd
 imageRepository: k8s.gcr.io
 kind: ClusterConfiguration
 kubernetesVersion: 1.22.0
 networking:
-dnsDomain: cluster.local
+    dnsDomain: cluster.local
 serviceSubnet: 10.96.0.0/12
 scheduler: {}
 ```
 
-用以下命令可以查看镜像列表:
+It can be told from the default configuration that, the configurations of etcd, apiServer, networking and cri are all included here.
+
+We can use the command shown below to list the images kubeadm will use:
 
 ```bash
 $kubeadm config images list
@@ -167,29 +177,29 @@ k8s.gcr.io/etcd:3.5.0-0
 k8s.gcr.io/coredns/coredns:v1.8.4
 ```
 
-可以使用`kubeadm config images pull`命令将这些镜像提前拉下来。就算不提前拉取，在后续步骤运行`kubeadm init`命令的时候也会自动进行拉取。
+We can also ues `kubeadm config images pull` command to pull these images in advance. However, even though we do not pull them in advance, they will be automatically pulled when we run `kubeadm init` later.
 
-使用以下命令就可直接安装 Master 节点：
+Then we can use the command shown below to directly deploy the Master node:
 
 ```bash
 $sudo kubeadm init --pod-network-cidr=172.30.0.0/16
 ```
 
-这里注意一定要加上后面的`—pod-network-cidr`参数，否则在安装 flannel（网络插件）时会报以下错误：
+Here we need to notice that the `—pod-network-cidr` param is necessary, or this error will be thrown while installing flannel(network plugin):
 
 ```
 E0913 19:45:12.323393 1 main.go:293] Error registering network: failed to acquire lease: node "ip-172-31-40-163" pod cidr not assigned
 ```
 
-这次我没有修改默认的配置，如果有自定义配置，可以运行
+I didn't modify the default configuration this time, but if you have a customized configuration, then this command can be used:
 
 ```bash
 $sudo kubeadm init –config=<config_file_path>
 ```
 
-安装完成后会得到以下相关提示:
+After the installation is done, we will get this message:
 
-```
+```shell
 Your Kubernetes control-plane has initialized successfully!
 
 To start using your cluster, you need to run the following as a regular user:
@@ -212,7 +222,7 @@ kubeadm join 172.31.40.163:6443 --token 61gwee.be4wj16mlyjsahaj \
  --discovery-token-ca-cert-hash sha256:97ea59547a4cca2fbcf62360b3561c6e27dd4e1a294533505490391dab872daf
 ```
 
-根据提示可以运行以下命令，这些命令是为了方便用户通过`kubectl`访问集群，`config`文件里配置了访问集群的入口，用户以及 token 等。
+According to the message, we can run the command shown below to config the `kubectl`. The `config` file container the entry of the new cluster and user information:
 
 ```bash
 $mkdir -p $HOME/.kube
@@ -220,16 +230,17 @@ $sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 $sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-完成配置后就可以使用 kubectl 访问集群了。
+After the configuration, we can use `kubectl` to access the cluster we've just created.
 
-使用`kubectl get node`可以看到，目前`master node`的状态是`Not Ready`。
+By using `kubectl get node` command we can see that the status of `master node` is `Not Ready`:
+(It's shown `Ready` with `kubeadm:v1.25.4`)
 
 ```
 NAME             STATUS     ROLES                AGE    VERSION
 ip-172-31-40-163 NotReady   control-plane,master 14m    v1.22.1
 ```
 
-使用`kubectl get node <node_name> -o yaml`(或者`kubectl describe node <node_name>`)可以查看具体原因：
+We can use `kubectl get node <node_name> -o yaml`(or`kubectl describe node <node_name>`) command to find out the reason:
 
 ```yaml
 ...
@@ -240,7 +251,7 @@ status: "False"
 ...
 ```
 
-这是由于`kubeadm`的安装过程**不涉及**`网络插件（CNI)`的初始化，所以集群没有网络功能。
+According to the message, this is because the initialization process of `kubeadm` does not include initialization of `Network Plugin(CNI)`, so currently our cluster does not have network feature.
 
 ```bash
 $kubectl get pod --all-namespaces
@@ -254,18 +265,17 @@ kube-system kube-proxy-dzklf             1/1     Running 0       10m
 kube-system kube-scheduler-ip-172-...    1/1     Running 3       10m
 ```
 
-可以观察到`kubadm`已经为`master 节点`启动了`coredns`,`etcd`,`kube-apiserver`,`kube-controller-manager`,`kube-proxy`以及 `kube-scheduler`了。
-并且与网络相关`coredns`由于没有网络也无法正常启动。
+Also according to the info shown above, we get to observe that `kubeadm` already start the `coredns`, `etcd`, `kube-apiserver`, `kube-controller-manager`, `kube-proxy` and `kube-scheduler` for our master node. But because of the same reason that we've mentioned above, the `coredns` pod which is related to the network can not start normally as well.
 
-## #3 安装网络插件 Flannel
+## #3 Install Network Plugin Flannel
 
-首先下载在 Kubernetes 集群内安装`flanner`所需的配置文件，里面包括了启动该服务所需的所有资源的配置
+First, we need to download the file for installing `flannel` network plugin in Kubernetes cluster, which includes the configurations of all the components of this service.
 
 ```bash
 $wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 
-使用下载的 Yaml 文件在集群内启动所有相关资源
+Create all the components in the cluster with the Yaml file we've gotten
 
 ```bash
 $kubectl apply -f kube-flannel.yml
@@ -278,7 +288,7 @@ configmap/kube-flannel-cfg created
 daemonset.apps/kube-flannel-ds created
 ```
 
-现在查看`pod`的状态可以发现所有的`pod`都正常运行(`Running`)中
+After all the components of `Flannel` are started, we can observe that the status of all the pods is `Running` now.
 
 ```bash
 $ kubectl get pod --all-namespaces
@@ -293,7 +303,7 @@ kube-system kube-proxy-8c4md 1/1 Running 0 3m40s
 kube-system kube-scheduler-ip-172-31-40-163 1/1 Running 4 3m54s
 ```
 
-而`master 节点`也切换到了`Ready`的状态
+And our `master` node has turned to `Ready` as well.
 
 ```bash
 $ kubectl get node
@@ -301,19 +311,20 @@ NAME                STATUS  ROLES                   AGE     VERSION
 ip-172-31-40-163    Ready   control-plane,master    4m47s   v1.22.1
 ```
 
-# 搭建 Node 节点
-重复以上在`Master节点`中安装`kubeadm`等工具的过程。
+# Join Node 
 
-运行`kubeadm`在`Master 节点`安装完成后返回的将`worker 节点`加入集群的命令:
+To join a new node to our cluster, we can repeat the process of installing tools like `kubeadm` on a new machine.
+
+Then we can execute the command that we've gotten from `kubeadm` after we successfully created the master node to join a new node:
 
 ```bash
 $kubeadm join 172.31.40.163:6443 --token 61gwee.be4wj16mlyjsahaj \
  --discovery-token-ca-cert-hash sha256:97ea59547a4cca2fbcf62360b3561c6e27dd4e1a294533505490391dab872daf
 ```
 
-如果在创建 `Master节点`后忘记了以上命令及token，则可用`kubeadm token create --print-join-command`命令重新生成token并输出完整的`join`命令。
+If you forget to save the command and token shown above in the previous precess, you can use `kubeadm token create --print-join-command` command to generate a new token and print the complete `join` command.
 
-在以上命令成功运行后，在`Master节点`通过`kubectl get node`可观察到，集群已有两个节点：
+After the `join` command was executed, we can observe that there're two nodes in our new cluster now:
 
 ```bash
 $kubectl get node
@@ -323,17 +334,18 @@ ip-172-31-40-163   Ready    control-plane,master   23h   v1.22.1
 ip-172-31-47-241   Ready    <none>                 15s   v1.22.1
 ```
 
-# 错误及解决方案
+# Troubleshooting
 
-## #1 docker 连接 Docker daemon socket 失败
 
-运行`docker info`命令时得到以下错误：
+## <a id="T1"></a>#1 Docker failed to connect to Docker daemon socket
+
+If this error occurs when using the command `docker info`：
 
 ```
 ERROR: Got permission denied while trying to connect to the Docker daemon socket ...
 ```
 
-需要确认 docker 组已经创建并且当前使用的用户在这个组内。
+Then we need to make sure that the `docker` group has been created and that the account we're currently using is in this group:
 
 ```bash
 $sudo groupadd docker
@@ -342,23 +354,23 @@ $newgrp docker
 $systemctl restart docker
 ```
 
-完成以上步骤后，再次运行`docker info`命令可以正确得到所需信息。
+Then we can get the correct information that we need with `docker info` command.
 
-## #2 Kubelet 启动失败
+## <a id="T2"></a>#2 Failed to start Kubelet
 
-用`systemctl status kubelet`命令获得进程号后，再用`journalctl \_PID=<进程号>|vim – `查看日志，获得了以下信息：
+We probably can get this information by using `journalctl -u kubelet` to check the logs of `kubelet` service:
 
 ```bash
 Sep 13 17:30:09 ip-172-31-40-163 kubelet[18094]: E0913 17:30:09.620375 18094 server.go:294] "Failed to run kubelet" err="failed to run Kubelet: misconfiguration: kubelet cgroup driver: \"systemd\" is different from docker cgroup driver: \"cgroupfs\""
 ```
 
-原因是`docker`和`kubelet`使用的`cgroup driver`不一样，一个是`systemd`，一个是`cgroupfs`。根据 Kubernetes 官网文档：
+The reason is that `docker` and `kubelet` is using different `cgroup driver`: one is `systemd` while the another one if `cgroupfs`. According to Kubernetes's official documen:
 
 > `systemd driver` is **recommended** for `kubeadm` based setups instead of the `cgroupfs driver`, because kubeadm manages the kubelet as a systemd service.
 
-`systemd`是比较推荐的,也是 kubeadm 默认设置的 cgroup drive。（据说 systemd 更安全）所以这里我统一设置成使用 systemd。也就是需要把 `docker` 的`cgroup driver`更改成`systemd`
+`systemd` is recommanded, and also used by `kubeadm` by default.(Might because systemd is safer）So here I will use `systemd`, which means that I will need to change `cgroup driver` of `docker` to `systemd`.
 
-修改`/etc/docker/daemon.json`（或创建）
+Modify `/etc/docker/daemon.json`（or create）
 
 ```
 #/etc/docker/daemon.json
@@ -367,14 +379,14 @@ Sep 13 17:30:09 ip-172-31-40-163 kubelet[18094]: E0913 17:30:09.620375 18094 ser
 }
 ```
 
-在完成修改之后，用以下命令更新配置并重启 docker
+After the modification, we can reconfigure and restart `docker`:
 
 ```bash
 $systemctl daemon-reload
 $systemctl restart docker
 ```
 
-重启后使用`docker info`命令可获得 docker 的所有相关信息,可以确认 docker 的`cgroup driver`已经换成了`systemd`。
+If everything works fine, then we can use `docker info` command to gain all the information about `docker`, to make sure that its `cgroup driver` has been changed to `systemd`.
 
 ```bash
 $ docker info
@@ -387,4 +399,75 @@ Cgroup Version: 1
 
 ```
 
-此时再确认 kubelet 的状态可以看到 kubelet 已经自动重启并正常运行。
+Then we can check the status of `kubelet` again and find out that `kubelet` has restarted and works normally.
+
+## #3 Failed to pull image with `kubeadm config images pull`
+
+An error occurs when running `kuneadm config images pull`:
+```shell
+$ kubeadm config images pull
+failed to pull image "registry.k8s.io/kube-apiserver:v1.25.4": output: E1205 00:26:16.157713 3215543 remote_image.go:222] "PullImage from image service failed" err="rpc error: code = Unimplemented desc = unknown service runtime.v1alpha2.ImageService" image="registry.k8s.io/kube-apiserver:v1.25.4" time="2022-12-05T00:26:16-05:00" level=fatal msg="pulling image: rpc error: code = Unimplemented desc = unknown service runtime.v1alpha2.ImageService", error: exit status 1
+```
+
+Remove `config.toml` for `containerd` and restart it:
+
+```shell
+rm /etc/containerd/config.toml
+systemctl restart containerd
+```
+
+Then we can try to run the command again and the error will disappear.
+
+## #4 Failed to run `kubeadm init`
+
+While running `kubeadm init` command, we might end up getting this error:
+
+```shell
+kubelet-check] The HTTP call equal to 'curl -sSL http://localhost:10248/healthz' failed with error: Get "http://localhost:10248/healthz": dial tcp [::1]:10248: connect: connection refused.
+
+Unfortunately, an error has occurred:
+        timed out waiting for the condition
+
+This error is likely caused by:
+        - The kubelet is not running
+        - The kubelet is unhealthy due to a misconfiguration of the node in some way (required cgroups disabled)
+
+If you are on a systemd-powered system, you can try to troubleshoot the error with the following commands:
+        - 'systemctl status kubelet'
+        - 'journalctl -xeu kubelet'
+
+```
+
+So, according to the error message, first of all, let's check the status and logs of `kubelet`:
+
+```shell
+$ systemctl status kubelet
+   Loaded: loaded (/usr/lib/systemd/system/kubelet.service; enabled; vendor preset: disabled)
+  Drop-In: /usr/lib/systemd/system/kubelet.service.d
+           └─10-kubeadm.conf
+   Active: activating (auto-restart) (Result: exit-code) since Mon 2022-12-05 05:14:16
+   ...
+
+$ journalctl -f -u kubelet
+...
+ec 05 05:07:36 localhost.localdomain kubelet[3241658]: E1205 05:07:36.299425 3241658 run.go:74] "command failed" err="failed to run Kubelet: running with swap on is not supported, please disable swap! or set --fail-swap-on flag to false. /proc/swaps contained: [Filename\t\t\t\tType\t\tSize\tUsed\tPriority /dev/dm-1                               partition\t2097148\t0\t-2]"
+...
+```
+So the reason should be `swap`, which is a space on a disk. To fix the problem, we just need to directly turn it off, with command:
+```shell
+swapoff -a
+```
+Then we probably need to reset kubeadm with `kubeadm reset` command to start the initialization again.
+
+## #5 ip_forward contents are not set to 1
+
+If this message is shown while running `kubeadm init`:
+
+```shell
+[ERROR FileContent--proc-sys-net-ipv4-ip_forward]: /proc/sys/net/ipv4/ip_forward contents are not set to 1
+```
+Then we need to manually set `ip_forward` to 1 by modifying `/proc/sys/net/ipv4/ip_forward` file:
+
+```bash
+echo 1 > /proc/sys/net/ipv4/ip_forward
+```

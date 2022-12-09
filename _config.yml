@@ -103,7 +103,7 @@ theme: hipaper
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
     type: git
-    repo: git@github.com:lz-nsc/en.git
+    repo: git@github.com:lz-nsc/lz-nsc.github.io.git
     branch: master
 hide_posts:
   filter: hidden

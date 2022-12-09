@@ -14,12 +14,12 @@
   <meta name="description" content="Recently, I’ve try to use Cluster-api to deploy a cluster on vsphere. During this process, I’ve met many different problems, so in this article, I’m going to talk about how to use this tool and how to">
 <meta property="og:type" content="article">
 <meta property="og:title" content="[Cluster API] Deploy cluster on Vsphere">
-<meta property="og:url" content="http://lzreload.com/en/2022/09/22/Deploy-cluster-on-Vsphere-using-cluster-api/index.html">
+<meta property="og:url" content="http://lzreload.com/2022/09/22/Deploy-cluster-on-Vsphere-using-cluster-api/index.html">
 <meta property="og:site_name" content="Lynn&#39;s Blog">
 <meta property="og:description" content="Recently, I’ve try to use Cluster-api to deploy a cluster on vsphere. During this process, I’ve met many different problems, so in this article, I’m going to talk about how to use this tool and how to">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-09-22T11:48:59.000Z">
-<meta property="article:modified_time" content="2022-09-26T06:27:08.091Z">
+<meta property="article:modified_time" content="2022-11-10T09:32:16.777Z">
 <meta property="article:author" content="Lynn Zhou">
 <meta property="article:tag" content="Kubernetes">
 <meta property="article:tag" content="Cluster API">
@@ -27,7 +27,7 @@
   
     <link rel="alternate" href="/atom.xml" title="Lynn&#39;s Blog" type="application/atom+xml">
   
-  <link rel="icon" href="/en/css/images/favicon.ico">
+  <link rel="icon" href="/css/images/favicon.ico">
   
   <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
@@ -42,17 +42,17 @@
 
   <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
   
-<link rel="stylesheet" href="/en/css/style.css">
+<link rel="stylesheet" href="/css/style.css">
 
 
   
-<script src="/en/js/jquery-3.1.1.min.js"></script>
+<script src="/js/jquery-3.1.1.min.js"></script>
 
 
   <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/en/css/bootstrap.css" >
-  <link rel="stylesheet" href="/en/css/fashion.css" >
-  <link rel="stylesheet" href="/en/css/glyphs.css" >
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+  <link rel="stylesheet" href="/css/fashion.css" >
+  <link rel="stylesheet" href="/css/glyphs.css" >
   <script>
     function loadScript(url, cb) {
       var script = document.createElement('script');
@@ -79,7 +79,7 @@
 
           <h1 class="site-title">
             
-              <a href="/en/" title="Lynn&#39;s Blog" rel="home"> Lynn&#39;s Blog </a>
+              <a href="/" title="Lynn&#39;s Blog" rel="home"> Lynn&#39;s Blog </a>
             
           </h1>
           
@@ -92,13 +92,13 @@
             <div class="clearfix sf-menu">
               <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="/"> <a class="" href="/en/">Home</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="/"> <a class="" href="/">Home</a> </li>
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="archives"> <a class="" href="/en/archives">Archives</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="archives"> <a class="" href="/archives">Archives</a> </li>
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="categories"> <a class="" href="/en/categories">Categories</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="categories"> <a class="" href="/categories">Categories</a> </li>
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="tags"> <a class="" href="/en/tags">Tags</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="tags"> <a class="" href="/tags">Tags</a> </li>
                     
               </ul>
             </div>
@@ -130,7 +130,7 @@
     
     <div class="article-meta">
       
-	<a href="/en/2022/09/22/Deploy-cluster-on-Vsphere-using-cluster-api/" class="article-date">
+	<a href="/2022/09/22/Deploy-cluster-on-Vsphere-using-cluster-api/" class="article-date">
 	  <time datetime="2022-09-22T11:48:59.000Z" itemprop="datePublished">September 22, 2022</time>
 	</a>
 
@@ -197,7 +197,7 @@ $ clusterctl init --infrastructure vsphere<span aria-hidden="true" class="line-n
 
 <p>In this step, <code>clusterctl</code> will install 4 components into the cluster: <code>cluster-api</code>, <code>bootstrap-kubeadm</code>, <code>control-plan-kubeadm</code> and <code>infrastructure-vsphere</code>. Then we can use <code>kubectl get pods --all-namespaces</code> command to check the status of the management cluster. If some pods are stuck at ImagePullBackOff status, please check Troubleshooting #3 section.</p>
 <h3 id="3-Download-the-ova-file-and-deploy-a-template-on-Vsphere"><a href="#3-Download-the-ova-file-and-deploy-a-template-on-Vsphere" class="headerlink" title="3. Download the ova file and deploy a template on Vsphere"></a>3. Download the ova file and deploy a template on Vsphere</h3><p>It is required that machines provisioned by CAPV have <code>cloud-init</code>, <code>kubeadm</code>, and a <code>container runtime</code> pre-installed. We can use one of the CAPV machine images generated by SIG Cluster Lifecycle as a VM template. Images are available here: <a target="_blank" rel="noopener" href="https://github.com/kubernetes-sigs/cluster-api-provider-vsphere/blob/master/README.md#kubernetes-versions-with-published-ovas">ova download</a>.</p>
-<h2 id="4-Deploy-workload-cluster"><a href="#4-Deploy-workload-cluster" class="headerlink" title="4. Deploy workload cluster."></a>4. Deploy workload cluster.</h2><p>(1) Generate YAML file of the cluster:</p>
+<h2 id="4-Deploy-workload-cluster"><a href="#4-Deploy-workload-cluster" class="headerlink" title="4. Deploy workload cluster"></a>4. Deploy workload cluster</h2><p>(1) Generate YAML file of the cluster:</p>
 <p>Use the command shown below to generate a YAML file of the target cluster.</p>
 <pre class="line-numbers language-none"><code class="language-none">clusterctl generate cluster &lt;cluster name&gt; --kubernetes-version &lt;kubernete version&gt; --control-plane-machine-count 1  --worker-machine-count 3 &gt; cluster.yaml<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
@@ -545,7 +545,7 @@ metadata:
       
       
   <span class="ico-tags"></span>
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/en/tags/Cluster-API/" rel="tag">Cluster API</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/en/tags/Kubernetes/" rel="tag">Kubernetes</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Cluster-API/" rel="tag">Cluster API</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Kubernetes/" rel="tag">Kubernetes</a></li></ul>
 
       
         
@@ -586,7 +586,7 @@ metadata:
 <nav id="article-nav">
   
   
-    <a href="/en/2022/09/16/Docker-NetWork-1/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2022/09/16/Docker-NetWork-1/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">About Docker network - Part 1</div>
     </a>
@@ -602,7 +602,7 @@ metadata:
     <div id="toc" class="toc-article">
     <strong class="toc-title">Contents</strong>
     
-      <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Environment-requirements"><span class="nav-number">1.</span> <span class="nav-text">Environment requirements</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Deployment-Steps"><span class="nav-number">2.</span> <span class="nav-text">Deployment Steps</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Configure-clusterctl"><span class="nav-number">2.1.</span> <span class="nav-text">1. Configure clusterctl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Use-Kind-and-Cluserctl-to-create-a-management-cluster"><span class="nav-number">2.2.</span> <span class="nav-text">2. Use Kind and Cluserctl to create a management cluster</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Download-the-ova-file-and-deploy-a-template-on-Vsphere"><span class="nav-number">2.2.1.</span> <span class="nav-text">3. Download the ova file and deploy a template on Vsphere</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Deploy-workload-cluster"><span class="nav-number">2.3.</span> <span class="nav-text">4. Deploy workload cluster.</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Deploy-CNI"><span class="nav-number">2.4.</span> <span class="nav-text">5. Deploy CNI</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Troubleshooting"><span class="nav-number">3.</span> <span class="nav-text">Troubleshooting</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-No-VM-is-created-on-Vsphere-after-kubectl-apply-f-lt-cluster-yaml-file-gt"><span class="nav-number">3.1.</span> <span class="nav-text">#1 No VM is created on Vsphere after kubectl apply -f &lt;cluster_yaml_file&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Stuck-at-WaitingForKubeadmInit-after-VM-is-successfully-provisioned"><span class="nav-number">3.2.</span> <span class="nav-text">#2 Stuck at WaitingForKubeadmInit after VM is successfully provisioned</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Kubernetes-pods-stuck-at-ImagePullBackOff-status"><span class="nav-number">3.3.</span> <span class="nav-text">#3 Kubernetes pods stuck at ImagePullBackOff status</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-ControlPlane-stuck-at-PoweringOn-Machine"><span class="nav-number">3.4.</span> <span class="nav-text">#4 ControlPlane stuck at PoweringOn @ Machine&#x2F;-</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Fingerprint-error-certificate-error"><span class="nav-number">3.5.</span> <span class="nav-text">#5 Fingerprint error &#x2F; certificate error</span></a></li></ol></li></ol>
+      <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Environment-requirements"><span class="nav-number">1.</span> <span class="nav-text">Environment requirements</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Deployment-Steps"><span class="nav-number">2.</span> <span class="nav-text">Deployment Steps</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Configure-clusterctl"><span class="nav-number">2.1.</span> <span class="nav-text">1. Configure clusterctl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Use-Kind-and-Cluserctl-to-create-a-management-cluster"><span class="nav-number">2.2.</span> <span class="nav-text">2. Use Kind and Cluserctl to create a management cluster</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Download-the-ova-file-and-deploy-a-template-on-Vsphere"><span class="nav-number">2.2.1.</span> <span class="nav-text">3. Download the ova file and deploy a template on Vsphere</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Deploy-workload-cluster"><span class="nav-number">2.3.</span> <span class="nav-text">4. Deploy workload cluster</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Deploy-CNI"><span class="nav-number">2.4.</span> <span class="nav-text">5. Deploy CNI</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Troubleshooting"><span class="nav-number">3.</span> <span class="nav-text">Troubleshooting</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-No-VM-is-created-on-Vsphere-after-kubectl-apply-f-lt-cluster-yaml-file-gt"><span class="nav-number">3.1.</span> <span class="nav-text">#1 No VM is created on Vsphere after kubectl apply -f &lt;cluster_yaml_file&gt;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Stuck-at-WaitingForKubeadmInit-after-VM-is-successfully-provisioned"><span class="nav-number">3.2.</span> <span class="nav-text">#2 Stuck at WaitingForKubeadmInit after VM is successfully provisioned</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Kubernetes-pods-stuck-at-ImagePullBackOff-status"><span class="nav-number">3.3.</span> <span class="nav-text">#3 Kubernetes pods stuck at ImagePullBackOff status</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-ControlPlane-stuck-at-PoweringOn-Machine"><span class="nav-number">3.4.</span> <span class="nav-text">#4 ControlPlane stuck at PoweringOn @ Machine&#x2F;-</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Fingerprint-error-certificate-error"><span class="nav-number">3.5.</span> <span class="nav-text">#5 Fingerprint error &#x2F; certificate error</span></a></li></ol></li></ol>
     
     </div>
   </aside>
@@ -613,13 +613,13 @@ metadata:
     </div>
     <!-- <nav id="mobile-nav">
   
-    <a href="/en/" class="mobile-nav-link">Home</a>
+    <a href="/" class="mobile-nav-link">Home</a>
   
-    <a href="/en/archives" class="mobile-nav-link">Archives</a>
+    <a href="/archives" class="mobile-nav-link">Archives</a>
   
-    <a href="/en/categories" class="mobile-nav-link">Categories</a>
+    <a href="/categories" class="mobile-nav-link">Categories</a>
   
-    <a href="/en/tags" class="mobile-nav-link">Tags</a>
+    <a href="/tags" class="mobile-nav-link">Tags</a>
   
 </nav> -->
     <footer id="footer" class="site-footer">
@@ -699,13 +699,13 @@ metadata:
 
 
 
-<script src="/en/js/script.js"></script>
+<script src="/js/script.js"></script>
 
 
-<script src="/en/js/bootstrap.js"></script>
+<script src="/js/bootstrap.js"></script>
 
 
-<script src="/en/js/main.js"></script>
+<script src="/js/main.js"></script>
 
 
 
@@ -721,7 +721,7 @@ metadata:
 
 
       <script> 
-        loadScript('/en/js/lib/busuanzi.min.js') 
+        loadScript('/js/lib/busuanzi.min.js') 
       </script>
 
 

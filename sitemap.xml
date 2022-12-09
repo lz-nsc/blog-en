@@ -2,49 +2,56 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://lzreload.com/en/2022/04/15/Golang-Heap/</loc>
+    <loc>http://lzreload.com/2021/09/14/Setup-Kubernetes-cluster/</loc>
+    
+    <lastmod>2022-12-09</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://lzreload.com/2022/09/22/Deploy-cluster-on-Vsphere-using-cluster-api/</loc>
+    
+    <lastmod>2022-11-10</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://lzreload.com/2022/04/15/Golang-Heap/</loc>
     
     <lastmod>2022-09-26</lastmod>
     
   </url>
   
   <url>
-    <loc>http://lzreload.com/en/2022/09/16/Docker-NetWork-1/</loc>
+    <loc>http://lzreload.com/2022/09/16/Docker-NetWork-1/</loc>
     
     <lastmod>2022-09-26</lastmod>
     
   </url>
   
   <url>
-    <loc>http://lzreload.com/en/2022/09/22/Deploy-cluster-on-Vsphere-using-cluster-api/</loc>
+    <loc>http://lzreload.com/2022/05/08/About-Kubernetes-configuration-ConfigMap/</loc>
     
     <lastmod>2022-09-26</lastmod>
     
   </url>
   
   <url>
-    <loc>http://lzreload.com/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/</loc>
+    <loc>http://lzreload.com/tags/index.html</loc>
     
     <lastmod>2022-09-26</lastmod>
     
   </url>
   
   <url>
-    <loc>http://lzreload.com/en/tags/index.html</loc>
+    <loc>http://lzreload.com/categories/index.html</loc>
     
     <lastmod>2022-09-26</lastmod>
     
   </url>
   
   <url>
-    <loc>http://lzreload.com/en/categories/index.html</loc>
-    
-    <lastmod>2022-09-26</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://lzreload.com/en/about/index.html</loc>
+    <loc>http://lzreload.com/about/index.html</loc>
     
     <lastmod>2022-09-26</lastmod>
     
@@ -52,44 +59,44 @@
   
 
   <url>
-    <loc>http://lzreload.com/en</loc>
-    <lastmod>2022-09-26</lastmod>
+    <loc>http://lzreload.com/</loc>
+    <lastmod>2022-12-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   
   <url>
-    <loc>http://lzreload.com/en/tags/Kubernetes/</loc>
-    <lastmod>2022-09-26</lastmod>
+    <loc>http://lzreload.com/tags/Kubernetes/</loc>
+    <lastmod>2022-12-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://lzreload.com/en/tags/Cluster-API/</loc>
-    <lastmod>2022-09-26</lastmod>
+    <loc>http://lzreload.com/tags/Cluster-API/</loc>
+    <lastmod>2022-12-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://lzreload.com/en/tags/Docker/</loc>
-    <lastmod>2022-09-26</lastmod>
+    <loc>http://lzreload.com/tags/Docker/</loc>
+    <lastmod>2022-12-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://lzreload.com/en/tags/Network/</loc>
-    <lastmod>2022-09-26</lastmod>
+    <loc>http://lzreload.com/tags/Network/</loc>
+    <lastmod>2022-12-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://lzreload.com/en/tags/Golang/</loc>
-    <lastmod>2022-09-26</lastmod>
+    <loc>http://lzreload.com/tags/Golang/</loc>
+    <lastmod>2022-12-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>

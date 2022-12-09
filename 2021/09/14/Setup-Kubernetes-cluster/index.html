@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Setup Kubernetes cluster | Lynn&#39;s Blog</title><meta name="robots" content="noindex">
+  <title>Create your own Kubernetes cluster with kubeadm | Lynn&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   <meta name="keywords" content="Kubernetes" />
@@ -11,22 +11,22 @@
   
   
   
-  <meta name="description" content="This time I’m going to set up a Kubernetes cluster with kubeadm and record the whole process and problems. PreparationTo set up the cluster, we need 2 virtual machines: One works as Master node while">
+  <meta name="description" content="This article is about how to set up a Kubernetes cluster on our server with kubeadm, the problems we might meet during this process, and how to deal with them. Also, we can learn more about how the Ku">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Setup Kubernetes cluster">
-<meta property="og:url" content="http://lzreload.com/en/2021/09/14/Setup-Kubernetes-cluster/index.html">
+<meta property="og:title" content="Create your own Kubernetes cluster with kubeadm">
+<meta property="og:url" content="http://lzreload.com/2021/09/14/Setup-Kubernetes-cluster/index.html">
 <meta property="og:site_name" content="Lynn&#39;s Blog">
-<meta property="og:description" content="This time I’m going to set up a Kubernetes cluster with kubeadm and record the whole process and problems. PreparationTo set up the cluster, we need 2 virtual machines: One works as Master node while">
+<meta property="og:description" content="This article is about how to set up a Kubernetes cluster on our server with kubeadm, the problems we might meet during this process, and how to deal with them. Also, we can learn more about how the Ku">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-09-14T06:35:42.000Z">
-<meta property="article:modified_time" content="2021-09-14T07:24:00.000Z">
+<meta property="article:modified_time" content="2022-12-09T07:24:00.000Z">
 <meta property="article:author" content="Lynn Zhou">
 <meta property="article:tag" content="Kubernetes">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="Lynn&#39;s Blog" type="application/atom+xml">
   
-  <link rel="icon" href="/en/css/images/favicon.ico">
+  <link rel="icon" href="/css/images/favicon.ico">
   
   <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
@@ -41,17 +41,17 @@
 
   <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
   
-<link rel="stylesheet" href="/en/css/style.css">
+<link rel="stylesheet" href="/css/style.css">
 
 
   
-<script src="/en/js/jquery-3.1.1.min.js"></script>
+<script src="/js/jquery-3.1.1.min.js"></script>
 
 
   <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/en/css/bootstrap.css" >
-  <link rel="stylesheet" href="/en/css/fashion.css" >
-  <link rel="stylesheet" href="/en/css/glyphs.css" >
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+  <link rel="stylesheet" href="/css/fashion.css" >
+  <link rel="stylesheet" href="/css/glyphs.css" >
   <script>
     function loadScript(url, cb) {
       var script = document.createElement('script');
@@ -78,7 +78,7 @@
 
           <h1 class="site-title">
             
-              <a href="/en/" title="Lynn&#39;s Blog" rel="home"> Lynn&#39;s Blog </a>
+              <a href="/" title="Lynn&#39;s Blog" rel="home"> Lynn&#39;s Blog </a>
             
           </h1>
           
@@ -91,13 +91,13 @@
             <div class="clearfix sf-menu">
               <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="/"> <a class="" href="/en/">Home</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="/"> <a class="" href="/">Home</a> </li>
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="archives"> <a class="" href="/en/archives">Archives</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="archives"> <a class="" href="/archives">Archives</a> </li>
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="categories"> <a class="" href="/en/categories">Categories</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="categories"> <a class="" href="/categories">Categories</a> </li>
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="tags"> <a class="" href="/en/tags">Tags</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="tags"> <a class="" href="/tags">Tags</a> </li>
                     
               </ul>
             </div>
@@ -121,7 +121,7 @@
         
   
     <h1 class="thumb" class="article-title" itemprop="name">
-      Setup Kubernetes cluster
+      Create your own Kubernetes cluster with kubeadm
     </h1>
   
 
@@ -129,7 +129,7 @@
     
     <div class="article-meta">
       
-	<a href="/en/2021/09/14/Setup-Kubernetes-cluster/" class="article-date">
+	<a href="/2021/09/14/Setup-Kubernetes-cluster/" class="article-date">
 	  <time datetime="2021-09-14T06:35:42.000Z" itemprop="datePublished">September 14, 2021</time>
 	</a>
 
@@ -141,8 +141,11 @@
     </div>
     <div class="article-entry" itemprop="articleBody">
       
-        <p>This time I’m going to set up a <code>Kubernetes cluster</code> with <code>kubeadm</code> and record the whole process and problems.</p>
-<h1 id="Preparation"><a href="#Preparation" class="headerlink" title="Preparation"></a>Preparation</h1><p>To set up the cluster, we need 2 virtual machines: One works as <code>Master node</code> while the other works as <code>worker node</code>, which allows me to do more tests related to cluster in the future.</p>
+        <p>This article is about how to set up a <code>Kubernetes cluster</code> on our server with <code>kubeadm</code>, the problems we might meet during this process, and how to deal with them. Also, we can learn more about how the Kubernetes cluster works from this whole process.</p>
+<span id="more"></span>
+
+
+<h1 id="Preparation"><a href="#Preparation" class="headerlink" title="Preparation"></a>Preparation</h1><p>To set up the cluster, we need 2 virtual machines: One works as a <code>Master node</code> while the other works as a <code>worker node</code>, which allows me to do more tests related to the cluster in the future.</p>
 <p>Virtual Machine:</p>
 <ul>
 <li>  AWS t2.large(2vCPU 8GiB) *2</li>
@@ -151,18 +154,18 @@
 <ul>
 <li>  kubeadm</li>
 </ul>
-<p>kubeadm 是一个可以帮助一键搭建 Kubernetes 集群的工具。</p>
-<h1 id="搭建-Master-节点"><a href="#搭建-Master-节点" class="headerlink" title="搭建 Master 节点"></a>搭建 Master 节点</h1><h2 id="1-安装-kubeadm-以及相关工具"><a href="#1-安装-kubeadm-以及相关工具" class="headerlink" title="#1 安装 kubeadm 以及相关工具"></a>#1 安装 kubeadm 以及相关工具</h2><p>首先需要配置云服务器，安装需要的工具。</p>
+<p><code>kubeadm</code> is a tool that can help users easily create Kubernetes clusters.</p>
+<h1 id="Create-a-Kubernetes-control-plane-node"><a href="#Create-a-Kubernetes-control-plane-node" class="headerlink" title="Create a Kubernetes control-plane node"></a>Create a Kubernetes control-plane node</h1><h2 id="1-Install-kubeadm-and-related-tools"><a href="#1-Install-kubeadm-and-related-tools" class="headerlink" title="#1 Install kubeadm and related tools"></a>#1 Install kubeadm and related tools</h2><p>First of all, we need to set up the server can install all the tools.</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$sudo</span> <span class="token function">apt-get</span> update
 <span class="token variable">$sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> gnupg
 <span class="token variable">$curl</span> -s https://packages.cloud.google.com/apt/doc/apt-key.gpg <span class="token operator">|</span> <span class="token function">sudo</span> apt-key <span class="token function">add</span> -
 OK<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>需要将 Kubernetes 官方源添加到本地。</p>
+<p>Then we need to add Kubernetes’s official package repository.</p>
 <pre class="line-numbers language-none"><code class="language-none">#&#x2F;etc&#x2F;apt&#x2F;sources.list.d&#x2F;kubernetes.list
 deb http:&#x2F;&#x2F;apt.kubernetes.io&#x2F; kubernetes-xenial main<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p>将以上文件（/etc/apt/sources.list.d/kubernetes.list）添加了之后，运行以下命令可以看到此时 Kubernetes 的源已经被添加进来。</p>
+<p>After the file mentioned above（/etc/apt/sources.list.d/kubernetes.list）has been added, we can see that Kubenentes’s package repository has been included when we run the command shown below:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$sudo</span> <span class="token function">apt-get</span> update
 
 <span class="token punctuation">..</span>.
@@ -170,82 +173,87 @@ Get:4 https://packages.cloud.google.com/apt kubernetes-xenial InRelease <span cl
 Get:6 https://packages.cloud.google.com/apt kubernetes-xenial/main amd64 Packages <span class="token punctuation">[</span><span class="token number">49.4</span> kB<span class="token punctuation">]</span>
 <span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>在完成了以上的配置之后即可开始安装<code>kubelet</code>，<code>kubectl</code>以及<code>kubeadm</code></p>
-<p><code>kubeadm</code>需要使用<code>kubelet</code>服务来以容器方式部署和启动 Kubernetes 的主要服务，所以需要安装并先启动 kubelet 服务。<br>而<code>kubectl</code>则是客户端命令行工具，在集群搭建完成之后可以通过它查看集群信息与状态。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># 安装kubelet，kubectl以及kubeadm</span>
+<p>After the configuration above is done, we can start to install <code>kubelet</code>, <code>kubectl</code>, and <code>kubeadm</code>.</p>
+<p><code>kubeadm</code> needs to use <code>kubelet</code> to deploy and run Kubernetes’s services as containers, before the installation, we need to make sure <code>kubelet</code> service is running.</p>
+<p><code>kubectl</code> is a command line tool that can be used to check the cluster’s information and status after creating the cluster.</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Install kubelet, kubectl and kubeadm</span>
 <span class="token variable">$sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> kubelet kubectl kubeadm<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p>要启动 kubelet 需要先安装并启动<code>docker</code></p>
+<hr>
+<h3 id="Using-docker"><a href="#Using-docker" class="headerlink" title="Using docker"></a>Using docker</h3><blockquote>
+<p>When I first created a cluster on AWS, <code>docker</code> was still used by <code>kubelet</code> by default. Somehow now that seems <code>docker</code> has been deprecated by <code>Kubernetes</code> and when I try to use <code>kubeadm:v1.25.4</code> to create a cluster on Vsphere, <code>containerd</code> is used by default instead of <code>docker</code>. So, if you are not going to use docker, you can directly skip this section.</p>
+</blockquote>
+<p>To run <code>kubelet</code>, we need to install and run <code>docker</code>:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$curl</span> -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/debian/gpg <span class="token operator">|</span> <span class="token function">sudo</span> apt-key <span class="token function">add</span> -
 OK
 
-<span class="token comment"># 要安装了 software-properties-common 才能使用 add-apt-repository</span>
+<span class="token comment"># software-properties-common is needed for using add-apt-repository</span>
 <span class="token variable">$sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> software-properties-common
 <span class="token variable">$sudo</span> add-apt-repository <span class="token punctuation">\</span>
 <span class="token string">"deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/debian \
 <span class="token variable"><span class="token variable">$(</span>lsb_release -cs<span class="token variable">)</span></span> \
 stable"</span>
 <span class="token variable">$sudo</span> <span class="token function">apt-get</span> update
-<span class="token comment"># 安装docker</span>
+<span class="token comment"># Install docker</span>
 <span class="token variable">$sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> docker-ce<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>完成了以上所需工具的安装后就可以开始按顺序启动它们。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#启动docker</span>
+<p>After finishing the installation of all the tools that we need, we can start to run them by order.</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#First start docker</span>
 <span class="token variable">$systemctl</span> start docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p>在 docker正常启动并确定docker的<code>cgroup driver</code>为<code>systemd</code>后（详情可见<code>错误及解决方案 #2</code>），可开始安装<code>Master节点</code>。</p>
-<p>此时如果用<code>systemctl status kubelet</code>命令查看<code>kubelet</code>状态，可发现kubelet没有正常启动，报错为：</p>
+<p>After starting <code>docker</code> correctly and making sure that <code>cgroup driver</code> of docker is <code>systemd</code>(More details can be found in <a href="#T2"><code>Troubleshooting #2</code></a>), we can start to deploy <code>Master node</code> of the cluster.</p>
+<hr>
+<p>If now we use <code>systemctl status kubelet</code> command to check the status of <code>kubelet</code>, we can find out that <code>kubelet</code> didn’t start correctly and the error message is:</p>
 <pre class="line-numbers language-none"><code class="language-none">&quot;Failed to load kubelet config file&quot; err&#x3D;&quot;failed to load Kubelet config file...<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>这是因为还没有运行 <code>kubeadm init</code>命令，在这个命令运行了之后，<code>kubelet</code>的配置文件会被生成，<code>kubelet</code>也会自动重启并正常运行。</p>
-<h2 id="2-使用-kubeadm-安装-Master-节点"><a href="#2-使用-kubeadm-安装-Master-节点" class="headerlink" title="#2 使用 kubeadm 安装 Master 节点"></a>#2 使用 kubeadm 安装 Master 节点</h2><p>使用<code>kubeadm config</code>命令打印<code>kubeadm</code>的默认配置.</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#输出kubeadm默认配置</span>
+<p>This is because we haven’t run <code>kubeadm init</code> command yet, after this command is executed, the config file for <code>kubelet</code> will be generated, and <code>kubelet</code> will restart and run correctly.</p>
+<h2 id="2-Use-kubeadm-to-deploy-Master-node"><a href="#2-Use-kubeadm-to-deploy-Master-node" class="headerlink" title="#2 Use kubeadm to deploy Master node"></a>#2 Use kubeadm to deploy Master node</h2><p>Use <code>kubeadm config</code> command to print the default configuration of <code>kubeadm</code>.</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># Print default configuration of kubeadm</span>
 <span class="token variable">$kubeadm</span> config print init-defaults
-<span class="token comment">#将kubeadm默认配置保存到文件中方便做自定义修改</span>
+<span class="token comment">#Save the default configuration of kubeadm to file to apply customize modification</span>
 <span class="token variable">$kubeadm</span> config print init-defaults <span class="token operator">>></span> init.default.yaml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>以下是<code>kubeadm</code>打印出来的默认配置:</p>
-<pre class="line-numbers language-none"><code class="language-none">#init.default.yaml
-apiVersion: kubeadm.k8s.io&#x2F;v1beta3
-bootstrapTokens:
+<p>Here is the default configuration of <code>kubeadm</code>:</p>
+<pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token comment">#init.default.yaml</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> kubeadm.k8s.io/v1beta3
+<span class="token key atrule">bootstrapTokens</span><span class="token punctuation">:</span>
+<span class="token punctuation">-</span> <span class="token key atrule">groups</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> system<span class="token punctuation">:</span>bootstrappers<span class="token punctuation">:</span>kubeadm<span class="token punctuation">:</span>default<span class="token punctuation">-</span>node<span class="token punctuation">-</span>token
+  <span class="token key atrule">token</span><span class="token punctuation">:</span> abcdef.0123456789abcdef
+  <span class="token key atrule">ttl</span><span class="token punctuation">:</span> 24h0m0s
+  <span class="token key atrule">usages</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> signing
+  <span class="token punctuation">-</span> authentication
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> InitConfiguration
+<span class="token key atrule">localAPIEndpoint</span><span class="token punctuation">:</span>
+  <span class="token key atrule">advertiseAddress</span><span class="token punctuation">:</span> 1.2.3.4
+  <span class="token key atrule">bindPort</span><span class="token punctuation">:</span> <span class="token number">6443</span>
+<span class="token key atrule">nodeRegistration</span><span class="token punctuation">:</span>
+  <span class="token key atrule">criSocket</span><span class="token punctuation">:</span> /var/run/dockershim.sock
+  <span class="token key atrule">imagePullPolicy</span><span class="token punctuation">:</span> IfNotPresent
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> node
+  <span class="token key atrule">taints</span><span class="token punctuation">:</span> <span class="token null important">null</span>
 
--   groups:
-    -   system:bootstrappers:kubeadm:default-node-token
-        token: abcdef.0123456789abcdef
-        ttl: 24h0m0s
-        usages:
-    -   signing
-    -   authentication
-        kind: InitConfiguration
-        localAPIEndpoint:
-        advertiseAddress: 1.2.3.4
-        bindPort: 6443
-        nodeRegistration:
-        criSocket: &#x2F;var&#x2F;run&#x2F;dockershim.sock
-        imagePullPolicy: IfNotPresent
-        name: node
-        taints: null
+<span class="token punctuation">---</span>
 
----
+<span class="token key atrule">apiServer</span><span class="token punctuation">:</span>
+ <span class="token key atrule">timeoutForControlPlane</span><span class="token punctuation">:</span> 4m0s
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> kubeadm.k8s.io/v1beta3
+<span class="token key atrule">certificatesDir</span><span class="token punctuation">:</span> /etc/kubernetes/pki
+<span class="token key atrule">clusterName</span><span class="token punctuation">:</span> kubernetes
+<span class="token key atrule">controllerManager</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+<span class="token key atrule">dns</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+<span class="token key atrule">etcd</span><span class="token punctuation">:</span>
+  <span class="token key atrule">local</span><span class="token punctuation">:</span>
+  <span class="token key atrule">dataDir</span><span class="token punctuation">:</span> /var/lib/etcd
+<span class="token key atrule">imageRepository</span><span class="token punctuation">:</span> k8s.gcr.io
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ClusterConfiguration
+<span class="token key atrule">kubernetesVersion</span><span class="token punctuation">:</span> 1.22.0
+<span class="token key atrule">networking</span><span class="token punctuation">:</span>
+    <span class="token key atrule">dnsDomain</span><span class="token punctuation">:</span> cluster.local
+<span class="token key atrule">serviceSubnet</span><span class="token punctuation">:</span> 10.96.0.0/12
+<span class="token key atrule">scheduler</span><span class="token punctuation">:</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-apiServer:
-timeoutForControlPlane: 4m0s
-apiVersion: kubeadm.k8s.io&#x2F;v1beta3
-certificatesDir: &#x2F;etc&#x2F;kubernetes&#x2F;pki
-clusterName: kubernetes
-controllerManager: &#123;&#125;
-dns: &#123;&#125;
-etcd:
-local:
-dataDir: &#x2F;var&#x2F;lib&#x2F;etcd
-imageRepository: k8s.gcr.io
-kind: ClusterConfiguration
-kubernetesVersion: 1.22.0
-networking:
-dnsDomain: cluster.local
-serviceSubnet: 10.96.0.0&#x2F;12
-scheduler: &#123;&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>用以下命令可以查看镜像列表:</p>
+<p>It can be told from the default configuration that, the configurations of etcd, apiServer, networking and cri are all included here.</p>
+<p>We can use the command shown below to list the images kubeadm will use:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$kubeadm</span> config images list
 k8s.gcr.io/kube-apiserver:v1.22.1
 k8s.gcr.io/kube-controller-manager:v1.22.1
@@ -255,49 +263,49 @@ k8s.gcr.io/pause:3.5
 k8s.gcr.io/etcd:3.5.0-0
 k8s.gcr.io/coredns/coredns:v1.8.4<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>可以使用<code>kubeadm config images pull</code>命令将这些镜像提前拉下来。就算不提前拉取，在后续步骤运行<code>kubeadm init</code>命令的时候也会自动进行拉取。</p>
-<p>使用以下命令就可直接安装 Master 节点：</p>
+<p>We can also ues <code>kubeadm config images pull</code> command to pull these images in advance. However, even though we do not pull them in advance, they will be automatically pulled when we run <code>kubeadm init</code> later.</p>
+<p>Then we can use the command shown below to directly deploy the Master node:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$sudo</span> kubeadm init --pod-network-cidr<span class="token operator">=</span><span class="token number">172.30</span>.0.0/16<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>这里注意一定要加上后面的<code>—pod-network-cidr</code>参数，否则在安装 flannel（网络插件）时会报以下错误：</p>
+<p>Here we need to notice that the <code>—pod-network-cidr</code> param is necessary, or this error will be thrown while installing flannel(network plugin):</p>
 <pre class="line-numbers language-none"><code class="language-none">E0913 19:45:12.323393 1 main.go:293] Error registering network: failed to acquire lease: node &quot;ip-172-31-40-163&quot; pod cidr not assigned<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>这次我没有修改默认的配置，如果有自定义配置，可以运行</p>
+<p>I didn’t modify the default configuration this time, but if you have a customized configuration, then this command can be used:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$sudo</span> kubeadm init –config<span class="token operator">=</span><span class="token operator">&lt;</span>config_file_path<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>安装完成后会得到以下相关提示:</p>
-<pre class="line-numbers language-none"><code class="language-none">Your Kubernetes control-plane has initialized successfully!
+<p>After the installation is done, we will get this message:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">Your Kubernetes control-plane has initialized successfully<span class="token operator">!</span>
 
 To start using your cluster, you need to run the following as a regular user:
 
-mkdir -p $HOME&#x2F;.kube
-  sudo cp -i &#x2F;etc&#x2F;kubernetes&#x2F;admin.conf $HOME&#x2F;.kube&#x2F;config
-  sudo chown $(id -u):$(id -g) $HOME&#x2F;.kube&#x2F;config
+<span class="token function">mkdir</span> -p <span class="token environment constant">$HOME</span>/.kube
+  <span class="token function">sudo</span> <span class="token function">cp</span> -i /etc/kubernetes/admin.conf <span class="token environment constant">$HOME</span>/.kube/config
+  <span class="token function">sudo</span> <span class="token function">chown</span> <span class="token variable"><span class="token variable">$(</span><span class="token function">id</span> -u<span class="token variable">)</span></span><span class="token builtin class-name">:</span><span class="token variable"><span class="token variable">$(</span><span class="token function">id</span> -g<span class="token variable">)</span></span> <span class="token environment constant">$HOME</span>/.kube/config
 
-Alternatively, if you are the root user, you can run:
+Alternatively, <span class="token keyword">if</span> you are the root user, you can run:
 
-export KUBECONFIG&#x3D;&#x2F;etc&#x2F;kubernetes&#x2F;admin.conf
+<span class="token builtin class-name">export</span> <span class="token assign-left variable">KUBECONFIG</span><span class="token operator">=</span>/etc/kubernetes/admin.conf
 
 You should now deploy a pod network to the cluster.
-Run &quot;kubectl apply -f [podnetwork].yaml&quot; with one of the options listed at:
-https:&#x2F;&#x2F;kubernetes.io&#x2F;docs&#x2F;concepts&#x2F;cluster-administration&#x2F;addons&#x2F;
+Run <span class="token string">"kubectl apply -f [podnetwork].yaml"</span> with one of the options listed at:
+https://kubernetes.io/docs/concepts/cluster-administration/addons/
 
-Then you can join any number of worker nodes by running the following on each as root:
+Then you can <span class="token function">join</span> any number of worker nodes by running the following on each as root:
 
-kubeadm join 172.31.40.163:6443 --token 61gwee.be4wj16mlyjsahaj \
+kubeadm <span class="token function">join</span> <span class="token number">172.31</span>.40.163:6443 --token 61gwee.be4wj16mlyjsahaj <span class="token punctuation">\</span>
  --discovery-token-ca-cert-hash sha256:97ea59547a4cca2fbcf62360b3561c6e27dd4e1a294533505490391dab872daf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>根据提示可以运行以下命令，这些命令是为了方便用户通过<code>kubectl</code>访问集群，<code>config</code>文件里配置了访问集群的入口，用户以及 token 等。</p>
+<p>According to the message, we can run the command shown below to config the <code>kubectl</code>. The <code>config</code> file container the entry of the new cluster and user information:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$mkdir</span> -p <span class="token environment constant">$HOME</span>/.kube
 <span class="token variable">$sudo</span> <span class="token function">cp</span> -i /etc/kubernetes/admin.conf <span class="token environment constant">$HOME</span>/.kube/config
 <span class="token variable">$sudo</span> <span class="token function">chown</span> <span class="token variable"><span class="token variable">$(</span><span class="token function">id</span> -u<span class="token variable">)</span></span><span class="token builtin class-name">:</span><span class="token variable"><span class="token variable">$(</span><span class="token function">id</span> -g<span class="token variable">)</span></span> <span class="token environment constant">$HOME</span>/.kube/config<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<p>完成配置后就可以使用 kubectl 访问集群了。</p>
-<p>使用<code>kubectl get node</code>可以看到，目前<code>master node</code>的状态是<code>Not Ready</code>。</p>
+<p>After the configuration, we can use <code>kubectl</code> to access the cluster we’ve just created.</p>
+<p>By using <code>kubectl get node</code> command we can see that the status of <code>master node</code> is <code>Not Ready</code>:<br>(It’s shown <code>Ready</code> with <code>kubeadm:v1.25.4</code>)</p>
 <pre class="line-numbers language-none"><code class="language-none">NAME             STATUS     ROLES                AGE    VERSION
 ip-172-31-40-163 NotReady   control-plane,master 14m    v1.22.1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p>使用<code>kubectl get node &lt;node_name&gt; -o yaml</code>(或者<code>kubectl describe node &lt;node_name&gt;</code>)可以查看具体原因：</p>
+<p>We can use <code>kubectl get node &lt;node_name&gt; -o yaml</code>(or<code>kubectl describe node &lt;node_name&gt;</code>) command to find out the reason:</p>
 <pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token punctuation">...</span>
 <span class="token key atrule">message</span><span class="token punctuation">:</span> 'container runtime network not ready<span class="token punctuation">:</span> NetworkReady=false reason<span class="token punctuation">:</span>NetworkPluginNotReady
 <span class="token key atrule">message:docker</span><span class="token punctuation">:</span> <span class="token key atrule">network plugin is not ready</span><span class="token punctuation">:</span> cni config uninitialized'
@@ -305,7 +313,7 @@ ip-172-31-40-163 NotReady   control-plane,master 14m    v1.22.1<span aria-hidden
 <span class="token key atrule">status</span><span class="token punctuation">:</span> <span class="token string">"False"</span>
 <span class="token punctuation">...</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>这是由于<code>kubeadm</code>的安装过程<strong>不涉及</strong><code>网络插件（CNI)</code>的初始化，所以集群没有网络功能。</p>
+<p>According to the message, this is because the initialization process of <code>kubeadm</code> does not include initialization of <code>Network Plugin(CNI)</code>, so currently our cluster does not have network feature.</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$kubectl</span> get pod --all-namespaces
 NAMESPACE   NAME                        READY   STATUS  RESTARTS AGE
 kube-system coredns-78fcd69978-59b4t     <span class="token number">0</span>/1     Pending <span class="token number">0</span>       10m
@@ -316,11 +324,11 @@ kube-system kube-controller-manager-<span class="token punctuation">..</span>.  
 kube-system kube-proxy-dzklf             <span class="token number">1</span>/1     Running <span class="token number">0</span>       10m
 kube-system kube-scheduler-ip-172-<span class="token punctuation">..</span>.    <span class="token number">1</span>/1     Running <span class="token number">3</span>       10m<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>可以观察到<code>kubadm</code>已经为<code>master 节点</code>启动了<code>coredns</code>,<code>etcd</code>,<code>kube-apiserver</code>,<code>kube-controller-manager</code>,<code>kube-proxy</code>以及 <code>kube-scheduler</code>了。<br>并且与网络相关<code>coredns</code>由于没有网络也无法正常启动。</p>
-<h2 id="3-安装网络插件-Flannel"><a href="#3-安装网络插件-Flannel" class="headerlink" title="#3 安装网络插件 Flannel"></a>#3 安装网络插件 Flannel</h2><p>首先下载在 Kubernetes 集群内安装<code>flanner</code>所需的配置文件，里面包括了启动该服务所需的所有资源的配置</p>
+<p>Also according to the info shown above, we get to observe that <code>kubeadm</code> already start the <code>coredns</code>, <code>etcd</code>, <code>kube-apiserver</code>, <code>kube-controller-manager</code>, <code>kube-proxy</code> and <code>kube-scheduler</code> for our master node. But because of the same reason that we’ve mentioned above, the <code>coredns</code> pod which is related to the network can not start normally as well.</p>
+<h2 id="3-Install-Network-Plugin-Flannel"><a href="#3-Install-Network-Plugin-Flannel" class="headerlink" title="#3 Install Network Plugin Flannel"></a>#3 Install Network Plugin Flannel</h2><p>First, we need to download the file for installing <code>flannel</code> network plugin in Kubernetes cluster, which includes the configurations of all the components of this service.</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$wget</span> https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>使用下载的 Yaml 文件在集群内启动所有相关资源</p>
+<p>Create all the components in the cluster with the Yaml file we’ve gotten</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$kubectl</span> apply -f kube-flannel.yml
 
 podsecuritypolicy.policy/psp.flannel.unprivileged created
@@ -330,7 +338,7 @@ serviceaccount/flannel created
 configmap/kube-flannel-cfg created
 daemonset.apps/kube-flannel-ds created<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>现在查看<code>pod</code>的状态可以发现所有的<code>pod</code>都正常运行(<code>Running</code>)中</p>
+<p>After all the components of <code>Flannel</code> are started, we can observe that the status of all the pods is <code>Running</code> now.</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ kubectl get pod --all-namespaces
 NAMESPACE NAME READY STATUS RESTARTS AGE
 kube-system coredns-78fcd69978-xx27f <span class="token number">1</span>/1 Running <span class="token number">0</span> 3m40s
@@ -342,53 +350,53 @@ kube-system kube-flannel-ds-26tcn <span class="token number">1</span>/1 Running 
 kube-system kube-proxy-8c4md <span class="token number">1</span>/1 Running <span class="token number">0</span> 3m40s
 kube-system kube-scheduler-ip-172-31-40-163 <span class="token number">1</span>/1 Running <span class="token number">4</span> 3m54s<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>而<code>master 节点</code>也切换到了<code>Ready</code>的状态</p>
+<p>And our <code>master</code> node has turned to <code>Ready</code> as well.</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ kubectl get node
 NAME                STATUS  ROLES                   AGE     VERSION
 ip-172-31-40-163    Ready   control-plane,master    4m47s   v1.22.1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
-<h1 id="搭建-Node-节点"><a href="#搭建-Node-节点" class="headerlink" title="搭建 Node 节点"></a>搭建 Node 节点</h1><p>重复以上在<code>Master节点</code>中安装<code>kubeadm</code>等工具的过程。</p>
-<p>运行<code>kubeadm</code>在<code>Master 节点</code>安装完成后返回的将<code>worker 节点</code>加入集群的命令:</p>
+<h1 id="Join-Node"><a href="#Join-Node" class="headerlink" title="Join Node"></a>Join Node</h1><p>To join a new node to our cluster, we can repeat the process of installing tools like <code>kubeadm</code> on a new machine.</p>
+<p>Then we can execute the command that we’ve gotten from <code>kubeadm</code> after we successfully created the master node to join a new node:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$kubeadm</span> <span class="token function">join</span> <span class="token number">172.31</span>.40.163:6443 --token 61gwee.be4wj16mlyjsahaj <span class="token punctuation">\</span>
  --discovery-token-ca-cert-hash sha256:97ea59547a4cca2fbcf62360b3561c6e27dd4e1a294533505490391dab872daf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p>如果在创建 <code>Master节点</code>后忘记了以上命令及token，则可用<code>kubeadm token create --print-join-command</code>命令重新生成token并输出完整的<code>join</code>命令。</p>
-<p>在以上命令成功运行后，在<code>Master节点</code>通过<code>kubectl get node</code>可观察到，集群已有两个节点：</p>
+<p>If you forget to save the command and token shown above in the previous precess, you can use <code>kubeadm token create --print-join-command</code> command to generate a new token and print the complete <code>join</code> command.</p>
+<p>After the <code>join</code> command was executed, we can observe that there’re two nodes in our new cluster now:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$kubectl</span> get node
 
 NAME               STATUS   ROLES                  AGE   VERSION
 ip-172-31-40-163   Ready    control-plane,master   23h   v1.22.1
 ip-172-31-47-241   Ready    <span class="token operator">&lt;</span>none<span class="token operator">></span>                 15s   v1.22.1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h1 id="错误及解决方案"><a href="#错误及解决方案" class="headerlink" title="错误及解决方案"></a>错误及解决方案</h1><h2 id="1-docker-连接-Docker-daemon-socket-失败"><a href="#1-docker-连接-Docker-daemon-socket-失败" class="headerlink" title="#1 docker 连接 Docker daemon socket 失败"></a>#1 docker 连接 Docker daemon socket 失败</h2><p>运行<code>docker info</code>命令时得到以下错误：</p>
+<h1 id="Troubleshooting"><a href="#Troubleshooting" class="headerlink" title="Troubleshooting"></a>Troubleshooting</h1><h2 id="1-Docker-failed-to-connect-to-Docker-daemon-socket"><a href="#1-Docker-failed-to-connect-to-Docker-daemon-socket" class="headerlink" title="#1 Docker failed to connect to Docker daemon socket"></a><a id="T1"></a>#1 Docker failed to connect to Docker daemon socket</h2><p>If this error occurs when using the command <code>docker info</code>：</p>
 <pre class="line-numbers language-none"><code class="language-none">ERROR: Got permission denied while trying to connect to the Docker daemon socket ...<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>需要确认 docker 组已经创建并且当前使用的用户在这个组内。</p>
+<p>Then we need to make sure that the <code>docker</code> group has been created and that the account we’re currently using is in this group:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$sudo</span> <span class="token function">groupadd</span> docker
 <span class="token variable">$sudo</span> gpasswd -a <span class="token operator">&lt;</span>username<span class="token operator">></span> docker
 <span class="token variable">$newgrp</span> docker
 <span class="token variable">$systemctl</span> restart docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>完成以上步骤后，再次运行<code>docker info</code>命令可以正确得到所需信息。</p>
-<h2 id="2-Kubelet-启动失败"><a href="#2-Kubelet-启动失败" class="headerlink" title="#2 Kubelet 启动失败"></a>#2 Kubelet 启动失败</h2><p>用<code>systemctl status kubelet</code>命令获得进程号后，再用<code>journalctl \_PID=&lt;进程号&gt;|vim – </code>查看日志，获得了以下信息：</p>
+<p>Then we can get the correct information that we need with <code>docker info</code> command.</p>
+<h2 id="2-Failed-to-start-Kubelet"><a href="#2-Failed-to-start-Kubelet" class="headerlink" title="#2 Failed to start Kubelet"></a><a id="T2"></a>#2 Failed to start Kubelet</h2><p>We probably can get this information by using <code>journalctl -u kubelet</code> to check the logs of <code>kubelet</code> service:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">Sep <span class="token number">13</span> <span class="token number">17</span>:30:09 ip-172-31-40-163 kubelet<span class="token punctuation">[</span><span class="token number">18094</span><span class="token punctuation">]</span>: E0913 <span class="token number">17</span>:30:09.620375 <span class="token number">18094</span> server.go:294<span class="token punctuation">]</span> <span class="token string">"Failed to run kubelet"</span> <span class="token assign-left variable">err</span><span class="token operator">=</span><span class="token string">"failed to run Kubelet: misconfiguration: kubelet cgroup driver: <span class="token entity" title="\&quot;">\"</span>systemd<span class="token entity" title="\&quot;">\"</span> is different from docker cgroup driver: <span class="token entity" title="\&quot;">\"</span>cgroupfs<span class="token entity" title="\&quot;">\"</span>"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<p>原因是<code>docker</code>和<code>kubelet</code>使用的<code>cgroup driver</code>不一样，一个是<code>systemd</code>，一个是<code>cgroupfs</code>。根据 Kubernetes 官网文档：</p>
+<p>The reason is that <code>docker</code> and <code>kubelet</code> is using different <code>cgroup driver</code>: one is <code>systemd</code> while the another one if <code>cgroupfs</code>. According to Kubernetes’s official documen:</p>
 <blockquote>
 <p><code>systemd driver</code> is <strong>recommended</strong> for <code>kubeadm</code> based setups instead of the <code>cgroupfs driver</code>, because kubeadm manages the kubelet as a systemd service.</p>
 </blockquote>
-<p><code>systemd</code>是比较推荐的,也是 kubeadm 默认设置的 cgroup drive。（据说 systemd 更安全）所以这里我统一设置成使用 systemd。也就是需要把 <code>docker</code> 的<code>cgroup driver</code>更改成<code>systemd</code></p>
-<p>修改<code>/etc/docker/daemon.json</code>（或创建）</p>
+<p><code>systemd</code> is recommanded, and also used by <code>kubeadm</code> by default.(Might because systemd is safer）So here I will use <code>systemd</code>, which means that I will need to change <code>cgroup driver</code> of <code>docker</code> to <code>systemd</code>.</p>
+<p>Modify <code>/etc/docker/daemon.json</code>（or create）</p>
 <pre class="line-numbers language-none"><code class="language-none">#&#x2F;etc&#x2F;docker&#x2F;daemon.json
 &#123;
 &quot;exec-opts&quot;:[&quot;native.cgroupdriver&#x3D;systemd&quot;]
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>在完成修改之后，用以下命令更新配置并重启 docker</p>
+<p>After the modification, we can reconfigure and restart <code>docker</code>:</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$systemctl</span> daemon-reload
 <span class="token variable">$systemctl</span> restart docker<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p>重启后使用<code>docker info</code>命令可获得 docker 的所有相关信息,可以确认 docker 的<code>cgroup driver</code>已经换成了<code>systemd</code>。</p>
+<p>If everything works fine, then we can use <code>docker info</code> command to gain all the information about <code>docker</code>, to make sure that its <code>cgroup driver</code> has been changed to <code>systemd</code>.</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ docker info
 
 <span class="token punctuation">..</span>.
@@ -398,15 +406,57 @@ Cgroup Version: <span class="token number">1</span>
 <span class="token punctuation">..</span>.
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<p>此时再确认 kubelet 的状态可以看到 kubelet 已经自动重启并正常运行。</p>
-<!-- flag of hidden posts -->
+<p>Then we can check the status of <code>kubelet</code> again and find out that <code>kubelet</code> has restarted and works normally.</p>
+<h2 id="3-Failed-to-pull-image-with-kubeadm-config-images-pull"><a href="#3-Failed-to-pull-image-with-kubeadm-config-images-pull" class="headerlink" title="#3 Failed to pull image with kubeadm config images pull"></a>#3 Failed to pull image with <code>kubeadm config images pull</code></h2><p>An error occurs when running <code>kuneadm config images pull</code>:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ kubeadm config images pull
+failed to pull image <span class="token string">"registry.k8s.io/kube-apiserver:v1.25.4"</span><span class="token builtin class-name">:</span> output: E1205 00:26:16.157713 <span class="token number">3215543</span> remote_image.go:222<span class="token punctuation">]</span> <span class="token string">"PullImage from image service failed"</span> <span class="token assign-left variable">err</span><span class="token operator">=</span><span class="token string">"rpc error: code = Unimplemented desc = unknown service runtime.v1alpha2.ImageService"</span> <span class="token assign-left variable">image</span><span class="token operator">=</span><span class="token string">"registry.k8s.io/kube-apiserver:v1.25.4"</span> <span class="token assign-left variable">time</span><span class="token operator">=</span><span class="token string">"2022-12-05T00:26:16-05:00"</span> <span class="token assign-left variable">level</span><span class="token operator">=</span>fatal <span class="token assign-left variable">msg</span><span class="token operator">=</span><span class="token string">"pulling image: rpc error: code = Unimplemented desc = unknown service runtime.v1alpha2.ImageService"</span>, error: <span class="token builtin class-name">exit</span> status <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>Remove <code>config.toml</code> for <code>containerd</code> and restart it:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token function">rm</span> /etc/containerd/config.toml
+systemctl restart containerd<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>Then we can try to run the command again and the error will disappear.</p>
+<h2 id="4-Failed-to-run-kubeadm-init"><a href="#4-Failed-to-run-kubeadm-init" class="headerlink" title="#4 Failed to run kubeadm init"></a>#4 Failed to run <code>kubeadm init</code></h2><p>While running <code>kubeadm init</code> command, we might end up getting this error:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">kubelet-check<span class="token punctuation">]</span> The HTTP call equal to <span class="token string">'curl -sSL http://localhost:10248/healthz'</span> failed with error: Get <span class="token string">"http://localhost:10248/healthz"</span><span class="token builtin class-name">:</span> dial tcp <span class="token punctuation">[</span>::1<span class="token punctuation">]</span>:10248: connect: connection refused.
+
+Unfortunately, an error has occurred:
+        timed out waiting <span class="token keyword">for</span> the condition
+
+This error is likely caused by:
+        - The kubelet is not running
+        - The kubelet is unhealthy due to a misconfiguration of the node <span class="token keyword">in</span> some way <span class="token punctuation">(</span>required cgroups disabled<span class="token punctuation">)</span>
+
+If you are on a systemd-powered system, you can try to troubleshoot the error with the following commands:
+        - <span class="token string">'systemctl status kubelet'</span>
+        - <span class="token string">'journalctl -xeu kubelet'</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>So, according to the error message, first of all, let’s check the status and logs of <code>kubelet</code>:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ systemctl status kubelet
+   Loaded: loaded <span class="token punctuation">(</span>/usr/lib/systemd/system/kubelet.service<span class="token punctuation">;</span> enabled<span class="token punctuation">;</span> vendor preset: disabled<span class="token punctuation">)</span>
+  Drop-In: /usr/lib/systemd/system/kubelet.service.d
+           └─10-kubeadm.conf
+   Active: activating <span class="token punctuation">(</span>auto-restart<span class="token punctuation">)</span> <span class="token punctuation">(</span>Result: exit-code<span class="token punctuation">)</span> since Mon <span class="token number">2022</span>-12-05 05:14:16
+   <span class="token punctuation">..</span>.
+
+$ journalctl -f -u kubelet
+<span class="token punctuation">..</span>.
+ec 05 05:07:36 localhost.localdomain kubelet<span class="token punctuation">[</span><span class="token number">3241658</span><span class="token punctuation">]</span>: E1205 05:07:36.299425 <span class="token number">3241658</span> run.go:74<span class="token punctuation">]</span> <span class="token string">"command failed"</span> <span class="token assign-left variable">err</span><span class="token operator">=</span><span class="token string">"failed to run Kubelet: running with swap on is not supported, please disable swap! or set --fail-swap-on flag to false. /proc/swaps contained: [Filename<span class="token entity" title="\t">\t</span><span class="token entity" title="\t">\t</span><span class="token entity" title="\t">\t</span><span class="token entity" title="\t">\t</span>Type<span class="token entity" title="\t">\t</span><span class="token entity" title="\t">\t</span>Size<span class="token entity" title="\t">\t</span>Used<span class="token entity" title="\t">\t</span>Priority /dev/dm-1                               partition<span class="token entity" title="\t">\t</span>2097148<span class="token entity" title="\t">\t</span>0<span class="token entity" title="\t">\t</span>-2]"</span>
+<span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>So the reason should be <code>swap</code>, which is a space on a disk. To fix the problem, we just need to directly turn it off, with command:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">swapoff -a<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>Then we probably need to reset kubeadm with <code>kubeadm reset</code> command to start the initialization again.</p>
+<h2 id="5-ip-forward-contents-are-not-set-to-1"><a href="#5-ip-forward-contents-are-not-set-to-1" class="headerlink" title="#5 ip_forward contents are not set to 1"></a>#5 ip_forward contents are not set to 1</h2><p>If this message is shown while running <code>kubeadm init</code>:</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token punctuation">[</span>ERROR FileContent--proc-sys-net-ipv4-ip_forward<span class="token punctuation">]</span>: /proc/sys/net/ipv4/ip_forward contents are not <span class="token builtin class-name">set</span> to <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>Then we need to manually set <code>ip_forward</code> to 1 by modifying <code>/proc/sys/net/ipv4/ip_forward</code> file:</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token number">1</span> <span class="token operator">></span> /proc/sys/net/ipv4/ip_forward<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
       
     </div>
     <footer class="entry-meta entry-footer">
       
       
   <span class="ico-tags"></span>
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/en/tags/Kubernetes/" rel="tag">Kubernetes</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Kubernetes/" rel="tag">Kubernetes</a></li></ul>
 
       
         
@@ -444,6 +494,20 @@ Cgroup Version: <span class="token number">1</span>
   </div>
   
     
+<nav id="article-nav">
+  
+    <a href="/2022/04/15/Golang-Heap/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Go: About package heap
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
   
 </article>
 
@@ -453,7 +517,7 @@ Cgroup Version: <span class="token number">1</span>
     <div id="toc" class="toc-article">
     <strong class="toc-title">Contents</strong>
     
-      <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Preparation"><span class="nav-number">1.</span> <span class="nav-text">Preparation</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA-Master-%E8%8A%82%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">搭建 Master 节点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%AE%89%E8%A3%85-kubeadm-%E4%BB%A5%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%B7%A5%E5%85%B7"><span class="nav-number">2.1.</span> <span class="nav-text">#1 安装 kubeadm 以及相关工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8-kubeadm-%E5%AE%89%E8%A3%85-Master-%E8%8A%82%E7%82%B9"><span class="nav-number">2.2.</span> <span class="nav-text">#2 使用 kubeadm 安装 Master 节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%AE%89%E8%A3%85%E7%BD%91%E7%BB%9C%E6%8F%92%E4%BB%B6-Flannel"><span class="nav-number">2.3.</span> <span class="nav-text">#3 安装网络插件 Flannel</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA-Node-%E8%8A%82%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">搭建 Node 节点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">4.</span> <span class="nav-text">错误及解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-docker-%E8%BF%9E%E6%8E%A5-Docker-daemon-socket-%E5%A4%B1%E8%B4%A5"><span class="nav-number">4.1.</span> <span class="nav-text">#1 docker 连接 Docker daemon socket 失败</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Kubelet-%E5%90%AF%E5%8A%A8%E5%A4%B1%E8%B4%A5"><span class="nav-number">4.2.</span> <span class="nav-text">#2 Kubelet 启动失败</span></a></li></ol></li></ol>
+      <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Preparation"><span class="nav-number">1.</span> <span class="nav-text">Preparation</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Create-a-Kubernetes-control-plane-node"><span class="nav-number">2.</span> <span class="nav-text">Create a Kubernetes control-plane node</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Install-kubeadm-and-related-tools"><span class="nav-number">2.1.</span> <span class="nav-text">#1 Install kubeadm and related tools</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Using-docker"><span class="nav-number">2.1.1.</span> <span class="nav-text">Using docker</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Use-kubeadm-to-deploy-Master-node"><span class="nav-number">2.2.</span> <span class="nav-text">#2 Use kubeadm to deploy Master node</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Install-Network-Plugin-Flannel"><span class="nav-number">2.3.</span> <span class="nav-text">#3 Install Network Plugin Flannel</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Join-Node"><span class="nav-number">3.</span> <span class="nav-text">Join Node</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Troubleshooting"><span class="nav-number">4.</span> <span class="nav-text">Troubleshooting</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Docker-failed-to-connect-to-Docker-daemon-socket"><span class="nav-number">4.1.</span> <span class="nav-text">#1 Docker failed to connect to Docker daemon socket</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Failed-to-start-Kubelet"><span class="nav-number">4.2.</span> <span class="nav-text">#2 Failed to start Kubelet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Failed-to-pull-image-with-kubeadm-config-images-pull"><span class="nav-number">4.3.</span> <span class="nav-text">#3 Failed to pull image with kubeadm config images pull</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Failed-to-run-kubeadm-init"><span class="nav-number">4.4.</span> <span class="nav-text">#4 Failed to run kubeadm init</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-ip-forward-contents-are-not-set-to-1"><span class="nav-number">4.5.</span> <span class="nav-text">#5 ip_forward contents are not set to 1</span></a></li></ol></li></ol>
     
     </div>
   </aside>
@@ -464,13 +528,13 @@ Cgroup Version: <span class="token number">1</span>
     </div>
     <!-- <nav id="mobile-nav">
   
-    <a href="/en/" class="mobile-nav-link">Home</a>
+    <a href="/" class="mobile-nav-link">Home</a>
   
-    <a href="/en/archives" class="mobile-nav-link">Archives</a>
+    <a href="/archives" class="mobile-nav-link">Archives</a>
   
-    <a href="/en/categories" class="mobile-nav-link">Categories</a>
+    <a href="/categories" class="mobile-nav-link">Categories</a>
   
-    <a href="/en/tags" class="mobile-nav-link">Tags</a>
+    <a href="/tags" class="mobile-nav-link">Tags</a>
   
 </nav> -->
     <footer id="footer" class="site-footer">
@@ -550,13 +614,13 @@ Cgroup Version: <span class="token number">1</span>
 
 
 
-<script src="/en/js/script.js"></script>
+<script src="/js/script.js"></script>
 
 
-<script src="/en/js/bootstrap.js"></script>
+<script src="/js/bootstrap.js"></script>
 
 
-<script src="/en/js/main.js"></script>
+<script src="/js/main.js"></script>
 
 
 
@@ -572,7 +636,7 @@ Cgroup Version: <span class="token number">1</span>
 
 
       <script> 
-        loadScript('/en/js/lib/busuanzi.min.js') 
+        loadScript('/js/lib/busuanzi.min.js') 
       </script>
 
 

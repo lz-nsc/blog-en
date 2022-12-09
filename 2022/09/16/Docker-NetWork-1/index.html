@@ -14,24 +14,24 @@
   <meta name="description" content="Networking of Docker is a topic that I always want to talk about, so in the upcoming several About Docker network posts, including this one, I will try to introduce different networking modes of Docke">
 <meta property="og:type" content="article">
 <meta property="og:title" content="About Docker network - Part 1">
-<meta property="og:url" content="http://lzreload.com/en/2022/09/16/Docker-NetWork-1/index.html">
+<meta property="og:url" content="http://lzreload.com/2022/09/16/Docker-NetWork-1/index.html">
 <meta property="og:site_name" content="Lynn&#39;s Blog">
 <meta property="og:description" content="Networking of Docker is a topic that I always want to talk about, so in the upcoming several About Docker network posts, including this one, I will try to introduce different networking modes of Docke">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://lzreload.com/en/2022/09/16/Docker-NetWork-1/docker_bridge.png">
-<meta property="og:image" content="http://lzreload.com/en/2022/09/16/Docker-NetWork-1/docker_bridge_internal.png">
-<meta property="og:image" content="http://lzreload.com/en/2022/09/16/Docker-NetWork-1/docker_bridge_external.png">
+<meta property="og:image" content="http://lzreload.com/2022/09/16/Docker-NetWork-1/docker_bridge.png">
+<meta property="og:image" content="http://lzreload.com/2022/09/16/Docker-NetWork-1/docker_bridge_internal.png">
+<meta property="og:image" content="http://lzreload.com/2022/09/16/Docker-NetWork-1/docker_bridge_external.png">
 <meta property="article:published_time" content="2022-09-16T10:40:25.000Z">
 <meta property="article:modified_time" content="2022-09-26T06:36:55.578Z">
 <meta property="article:author" content="Lynn Zhou">
 <meta property="article:tag" content="Docker">
 <meta property="article:tag" content="Network">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://lzreload.com/en/2022/09/16/Docker-NetWork-1/docker_bridge.png">
+<meta name="twitter:image" content="http://lzreload.com/2022/09/16/Docker-NetWork-1/docker_bridge.png">
   
     <link rel="alternate" href="/atom.xml" title="Lynn&#39;s Blog" type="application/atom+xml">
   
-  <link rel="icon" href="/en/css/images/favicon.ico">
+  <link rel="icon" href="/css/images/favicon.ico">
   
   <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
@@ -46,17 +46,17 @@
 
   <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Oswald%3A300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
   
-<link rel="stylesheet" href="/en/css/style.css">
+<link rel="stylesheet" href="/css/style.css">
 
 
   
-<script src="/en/js/jquery-3.1.1.min.js"></script>
+<script src="/js/jquery-3.1.1.min.js"></script>
 
 
   <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="/en/css/bootstrap.css" >
-  <link rel="stylesheet" href="/en/css/fashion.css" >
-  <link rel="stylesheet" href="/en/css/glyphs.css" >
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+  <link rel="stylesheet" href="/css/fashion.css" >
+  <link rel="stylesheet" href="/css/glyphs.css" >
   <script>
     function loadScript(url, cb) {
       var script = document.createElement('script');
@@ -83,7 +83,7 @@
 
           <h1 class="site-title">
             
-              <a href="/en/" title="Lynn&#39;s Blog" rel="home"> Lynn&#39;s Blog </a>
+              <a href="/" title="Lynn&#39;s Blog" rel="home"> Lynn&#39;s Blog </a>
             
           </h1>
           
@@ -96,13 +96,13 @@
             <div class="clearfix sf-menu">
               <ul id="main-nav" class="menu sf-js-enabled sf-arrows"  style="touch-action: pan-y;">
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="/"> <a class="" href="/en/">Home</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="/"> <a class="" href="/">Home</a> </li>
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="archives"> <a class="" href="/en/archives">Archives</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="archives"> <a class="" href="/archives">Archives</a> </li>
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="categories"> <a class="" href="/en/categories">Categories</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="categories"> <a class="" href="/categories">Categories</a> </li>
                     
-                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="tags"> <a class="" href="/en/tags">Tags</a> </li>
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663" linktext="tags"> <a class="" href="/tags">Tags</a> </li>
                     
               </ul>
             </div>
@@ -134,7 +134,7 @@
     
     <div class="article-meta">
       
-	<a href="/en/2022/09/16/Docker-NetWork-1/" class="article-date">
+	<a href="/2022/09/16/Docker-NetWork-1/" class="article-date">
 	  <time datetime="2022-09-16T10:40:25.000Z" itemprop="datePublished">September 16, 2022</time>
 	</a>
 
@@ -486,7 +486,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
       
       
   <span class="ico-tags"></span>
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/en/tags/Docker/" rel="tag">Docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/en/tags/Network/" rel="tag">Network</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Docker/" rel="tag">Docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Network/" rel="tag">Network</a></li></ul>
 
       
         
@@ -526,7 +526,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
     
 <nav id="article-nav">
   
-    <a href="/en/2022/09/22/Deploy-cluster-on-Vsphere-using-cluster-api/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2022/09/22/Deploy-cluster-on-Vsphere-using-cluster-api/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
@@ -536,7 +536,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
     </a>
   
   
-    <a href="/en/2022/05/08/About-Kubernetes-configuration-ConfigMap/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2022/05/08/About-Kubernetes-configuration-ConfigMap/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">About Kubernetes configuration: ConfigMap</div>
     </a>
@@ -563,13 +563,13 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
     </div>
     <!-- <nav id="mobile-nav">
   
-    <a href="/en/" class="mobile-nav-link">Home</a>
+    <a href="/" class="mobile-nav-link">Home</a>
   
-    <a href="/en/archives" class="mobile-nav-link">Archives</a>
+    <a href="/archives" class="mobile-nav-link">Archives</a>
   
-    <a href="/en/categories" class="mobile-nav-link">Categories</a>
+    <a href="/categories" class="mobile-nav-link">Categories</a>
   
-    <a href="/en/tags" class="mobile-nav-link">Tags</a>
+    <a href="/tags" class="mobile-nav-link">Tags</a>
   
 </nav> -->
     <footer id="footer" class="site-footer">
@@ -649,13 +649,13 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 
 
 
-<script src="/en/js/script.js"></script>
+<script src="/js/script.js"></script>
 
 
-<script src="/en/js/bootstrap.js"></script>
+<script src="/js/bootstrap.js"></script>
 
 
-<script src="/en/js/main.js"></script>
+<script src="/js/main.js"></script>
 
 
 
@@ -671,7 +671,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 
 
       <script> 
-        loadScript('/en/js/lib/busuanzi.min.js') 
+        loadScript('/js/lib/busuanzi.min.js') 
       </script>
 
 

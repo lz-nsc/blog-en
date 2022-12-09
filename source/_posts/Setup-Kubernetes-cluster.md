@@ -1,6 +1,6 @@
 ---
 title: Create your own Kubernetes cluster with kubeadm
-date: 2021-09-14 14:35:42
+date: 2022-12-09 14:35:42
 updated: 2022-12-09 15:24:00
 tags:
     - Kubernetes

@@ -2,13 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://lzreload.com/2023/02/16/Upgrade-Istio-With-Canary-Upgrade/</loc>
-    
-    <lastmod>2023-02-23</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://lzreload.com/2022/12/09/Setup-Kubernetes-cluster/</loc>
     
     <lastmod>2022-12-09</lastmod>
@@ -81,27 +74,6 @@
   </url>
   
   <url>
-    <loc>http://lzreload.com/tags/Cluster-API/</loc>
-    <lastmod>2023-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://lzreload.com/tags/Golang/</loc>
-    <lastmod>2023-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://lzreload.com/tags/Istio/</loc>
-    <lastmod>2023-02-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>http://lzreload.com/tags/Docker/</loc>
     <lastmod>2023-02-23</lastmod>
     <changefreq>daily</changefreq>
@@ -110,6 +82,20 @@
   
   <url>
     <loc>http://lzreload.com/tags/Network/</loc>
+    <lastmod>2023-02-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://lzreload.com/tags/Cluster-API/</loc>
+    <lastmod>2023-02-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://lzreload.com/tags/Golang/</loc>
     <lastmod>2023-02-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
